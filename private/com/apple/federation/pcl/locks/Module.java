@@ -1,4 +1,4 @@
-package com.apple.federation.pcl.locks;
+package com.apple.federation.pkl.locks;
 
 import java.util.Objects;
 
@@ -14,7 +14,7 @@ public class Module {
         String[] parts = fullyQualified.split(":");
 
         if (parts.length !=2 && parts.length != 3) {
-            throw new IllegalArgumentException("Expected fully qualified Pcl dep: " + fullyQualified);
+            throw new IllegalArgumentException("Expected fully qualified Pkl dep: " + fullyQualified);
         }
 
         this.repo = parts[0];

@@ -1,24 +1,24 @@
 load(
-    "//pcl/private:pcl.bzl",
-    _PCL_JVM_FLAGS = "PCL_JVM_FLAGS",
-    _pcl_run = "pcl_run",
-    _pcl_test = "pcl_test",
+    "//pkl/private:pkl.bzl",
+    _PKL_JVM_FLAGS = "PKL_JVM_FLAGS",
+    _pkl_run = "pkl_run",
+    _pkl_test = "pkl_test",
 )
 load(
-    "//pcl/private:pcl_codegen.bzl",
-    _pcl_config_java_library = "pcl_config_java_library",
-    _pcl_config_src = "pcl_config_src",
+    "//pkl/private:pkl_codegen.bzl",
+    _pkl_config_java_library = "pkl_config_java_library",
+    _pkl_config_src = "pkl_config_src",
 )
-load("//pcl/private:pcl_doc.bzl", _pcl_doc = "pcl_doc")
-load("//pcl/private:pcl_library.bzl", _pcl_library = "pcl_library")
-load("//pcl/private:pcl_test_suite.bzl", _pcl_test_suite = "pcl_test_suite")
+load("//pkl/private:pkl_doc.bzl", _pkl_doc = "pkl_doc")
+load("//pkl/private:pkl_library.bzl", _pkl_library = "pkl_library")
+load("//pkl/private:pkl_test_suite.bzl", _pkl_test_suite = "pkl_test_suite")
 
-PCL_JVM_FLAGS = _PCL_JVM_FLAGS
+PKL_JVM_FLAGS = _PKL_JVM_FLAGS
 
-pcl_config_java_library = _pcl_config_java_library
-pcl_config_src = _pcl_config_src
-pcl_doc = _pcl_doc
-pcl_library = _pcl_library
-pcl_run = _pcl_run
-pcl_test = _pcl_test
-pcl_test_suite = _pcl_test_suite
+pkl_config_java_library = _pkl_config_java_library
+pkl_config_src = _pkl_config_src
+pkl_doc = _pkl_doc
+pkl_library = _pkl_library
+pkl_run = _pkl_run
+pkl_test = _pkl_test
+pkl_test_suite = _pkl_test_suite

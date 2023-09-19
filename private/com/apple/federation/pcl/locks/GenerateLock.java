@@ -1,4 +1,4 @@
-package com.apple.federation.pcl.locks;
+package com.apple.federation.pkl.locks;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -204,8 +204,8 @@ public class GenerateLock {
                 module = new Module(module.toFullyQualifiedModuleString() + ":" + dep.getVersion());
             }
 
-            // Any URI with a `pcl` scheme refers to the standard lib, and is supplied by Pcl
-            if (!"pcl".equals(module.getRepositoryName())) {
+            // Any URI with a `pkl` scheme refers to the standard lib, and is supplied by Pkl
+            if (!"pkl".equals(module.getRepositoryName())) {
                 toReturn.add(module);
             }
         }
@@ -219,9 +219,9 @@ public class GenerateLock {
             throw new IllegalArgumentException("Unable to find mapping for scheme in module " + module);
         }
 
-        // url = "{repo}{module_name}/{version}/{simple_name}-{version}.pcl"
+        // url = "{repo}{module_name}/{version}/{simple_name}-{version}.pkl"
 
-        String rawUri = String.format("%s%s/%s/%s-%s.pcl",
+        String rawUri = String.format("%s%s/%s/%s-%s.pkl",
             baseUri,
             module.getModuleName(),
             module.getVersion(),

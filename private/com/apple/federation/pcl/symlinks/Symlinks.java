@@ -1,4 +1,4 @@
-package com.apple.federation.pcl.symlinks;
+package com.apple.federation.pkl.symlinks;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;

@@ -1,7 +1,7 @@
-load(":pcl.bzl", "pcl_test")
-load(":pcl_library.bzl", "pcl_library")
+load(":pkl.bzl", "pkl_test")
+load(":pkl_library.bzl", "pkl_library")
 
-def pcl_test_suite(
+def pkl_test_suite(
         name,
         srcs,
         deps = None,
@@ -11,16 +11,16 @@ def pcl_test_suite(
         test_suffix = None,
         executor = None,
         **kwargs):
-    """Create a suite of pcl tests from the provided files files.
+    """Create a suite of pkl tests from the provided files files.
 
     Given the list of `srcs`, this macro will generate:
 
-    1. A `pcl_test` target (with visibility:private) per `src` that ends with `test_suffix`
-    2. A `pcl_library` that accumulates any files that don't match `test_suffix`
-    3. A `native.test_suite` that accumulates all of the `pcl_test` targets
+    1. A `pkl_test` target (with visibility:private) per `src` that ends with `test_suffix`
+    2. A `pkl_library` that accumulates any files that don't match `test_suffix`
+    3. A `native.test_suite` that accumulates all of the `pkl_test` targets
     """
     if test_suffix == None:
-        test_suffix = "_test.pcl"
+        test_suffix = "_test.pkl"
 
     if deps == None:
         deps = []
@@ -32,7 +32,7 @@ def pcl_test_suite(
         lib_dep_name = "%s-test-lib" % name
         lib_dep_label = ":%s" % lib_dep_name
 
-        pcl_library(
+        pkl_library(
             name = lib_dep_name,
             srcs = nontest_srcs,
             deps = deps,
@@ -45,9 +45,9 @@ def pcl_test_suite(
     tests = []
 
     for src in test_srcs:
-        test_name = src.replace(".pcl", "")
+        test_name = src.replace(".pkl", "")
 
-        pcl_test(
+        pkl_test(
             name = test_name,
             srcs = [src],
             size = size,

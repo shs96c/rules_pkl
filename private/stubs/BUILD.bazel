@@ -1,12 +1,12 @@
-load("//pcl/private:pcl.bzl", "pcl_test")
+load("//pkl/private:pkl.bzl", "pkl_test")
 
-pcl_test(
+pkl_test(
     name = "should-pass",
-    srcs = [":valid.pcl"],
+    srcs = [":valid.pkl"],
 )
 
-pcl_test(
+pkl_test(
     name = "should-fail",
-    srcs = [":invalid.pcl"],
+    srcs = [":invalid.pkl"],
     tags = ["manual"],
 )

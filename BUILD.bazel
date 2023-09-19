@@ -1,7 +1,7 @@
 load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
 load("@bazel_skylib//rules:copy_file.bzl", "copy_file")
 load("//java/private:artifact.bzl", "artifact")
-load("//pcl/private:pcl.bzl", "PCL_JVM_FLAGS")
+load("//pkl/private:pkl.bzl", "PKL_JVM_FLAGS")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -11,47 +11,47 @@ exports_files([
 ])
 
 copy_file(
-    name = "pcl_native_executable",
-    src = "@pcl_constants//:pcl_native_executable",
-    out = "pcl",
+    name = "pkl_native_executable",
+    src = "@pkl_constants//:pkl_native_executable",
+    out = "pkl",
     allow_symlink = True,
     is_executable = True,
     visibility = ["//visibility:public"],
 )
 
 java_binary(
-    name = "pcl_java_executable",
-    jvm_flags = PCL_JVM_FLAGS,
-    main_class = "com.apple.pcl.cli.Main",
+    name = "pkl_java_executable",
+    jvm_flags = PKL_JVM_FLAGS,
+    main_class = "com.apple.pkl.cli.Main",
     visibility = [
         "//visibility:public",
     ],
     runtime_deps = [
-        "@pcl_java//jar",
+        "@pkl_java//jar",
     ],
 )
 
 java_binary(
-    name = "pcl_codegen_cli",
-    main_class = "com.apple.pcl.codegen.java.Main",
+    name = "pkl_codegen_cli",
+    main_class = "com.apple.pkl.codegen.java.Main",
     visibility = [
         "//visibility:public",
     ],
     runtime_deps = [
-        # pcl-apple provides the `applehub` provider
-        artifact("com.apple.pcl:pcl-apple"),
-        artifact("com.apple.pcl:pcl-codegen-java"),
+        # pkl-apple provides the `applehub` provider
+        artifact("com.apple.pkl:pkl-apple"),
+        artifact("com.apple.pkl:pkl-codegen-java"),
     ],
 )
 
 java_binary(
-    name = "pcl_doc_cli",
-    main_class = "com.apple.pcl.doc.Main",
+    name = "pkl_doc_cli",
+    main_class = "com.apple.pkl.doc.Main",
     visibility = [
         "//visibility:public",
     ],
     runtime_deps = [
-        artifact("com.apple.pcl:pcl-doc"),
+        artifact("com.apple.pkl:pkl-doc"),
     ],
 )
 
@@ -60,10 +60,10 @@ bzl_library(
     srcs = [
         "repositories.bzl",
         "setup.bzl",
-        "//pcl/private:docs",
+        "//pkl/private:docs",
     ],
     visibility = [
         "//:__pkg__",
-        "//pcl:__subpackages__",
+        "//pkl:__subpackages__",
     ],
 )

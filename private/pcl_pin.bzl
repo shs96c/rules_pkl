@@ -1,6 +1,6 @@
 load(":utils.bzl", "generate_lock_hash")
 
-def _pcl_pin_impl(ctx):
+def _pkl_pin_impl(ctx):
     hash = generate_lock_hash(ctx.attr.deps)
 
     params = {
@@ -23,7 +23,7 @@ set -eu
 
 {generate_lock} {params} > "$BUILD_WORKSPACE_DIRECTORY/{lock_file}"
 
-echo "Wrote Pcl deps to {lock_file}"
+echo "Wrote Pkl deps to {lock_file}"
 """.format(
             generate_lock = ctx.executable._generate_lock_file.short_path,
             params = params.short_path,
@@ -47,8 +47,8 @@ echo "Wrote Pcl deps to {lock_file}"
         ),
     ]
 
-pcl_pin = rule(
-    _pcl_pin_impl,
+pkl_pin = rule(
+    _pkl_pin_impl,
     executable = True,
     attrs = {
         "repo_name": attr.string(),
@@ -57,14 +57,14 @@ pcl_pin = rule(
         ),
         "repositories": attr.string_dict(
             default = {
-                "applehub": "https://artifacts.apple.com/pcl/",
+                "applehub": "https://artifacts.apple.com/pkl/",
             },
         ),
         "lock_file": attr.string(),
         "_generate_lock_file": attr.label(
             executable = True,
             cfg = "exec",
-            default = "@apple_federation//pcl/private/com/apple/federation/pcl/locks:GenerateLock",
+            default = "@apple_federation//pkl/private/com/apple/federation/pkl/locks:GenerateLock",
         ),
     },
 )

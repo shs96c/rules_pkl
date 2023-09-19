@@ -1,4 +1,4 @@
-package com.apple.federation.pcl.locks;
+package com.apple.federation.pkl.locks;
 
 // Copyright 2020 The Bazel Authors. All rights reserved.
 //
@@ -16,7 +16,7 @@ package com.apple.federation.pcl.locks;
 
 // Originally com.google.devtools.build.lib.authandtls.NetrcParser
 
-import com.apple.federation.pcl.locks.Netrc.Credential;
+import com.apple.federation.pkl.locks.Netrc.Credential;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 

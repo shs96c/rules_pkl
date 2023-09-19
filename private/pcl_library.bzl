@@ -1,41 +1,41 @@
-load(":providers.bzl", "PclFileInfo")
+load(":providers.bzl", "PklFileInfo")
 
-def _pcl_library_impl(ctx):
+def _pkl_library_impl(ctx):
     src_files = ctx.files.srcs + ctx.files.data
 
     dep_files = depset(
         direct = src_files,
-        transitive = [dep[PclFileInfo].dep_files for dep in ctx.attr.deps],
+        transitive = [dep[PklFileInfo].dep_files for dep in ctx.attr.deps],
     )
 
     cache_entries = depset(
-        transitive = [dep[PclFileInfo].cache_entries for dep in ctx.attr.deps] +
-                     [src[PclFileInfo].cache_entries for src in ctx.attr.srcs if PclFileInfo in src],
+        transitive = [dep[PklFileInfo].cache_entries for dep in ctx.attr.deps] +
+                     [src[PklFileInfo].cache_entries for src in ctx.attr.srcs if PklFileInfo in src],
     )
 
     return [
         DefaultInfo(
             files = depset(src_files),
         ),
-        PclFileInfo(
+        PklFileInfo(
             dep_files = dep_files,
             cache_entries = cache_entries,
         ),
         OutputGroupInfo(
-            pcl_sources = depset(src_files, transitive = [dep_files]),
+            pkl_sources = depset(src_files, transitive = [dep_files]),
         ),
     ]
 
-pcl_library = rule(
-    _pcl_library_impl,
+pkl_library = rule(
+    _pkl_library_impl,
     attrs = {
         "srcs": attr.label_list(
             mandatory = True,
-            allow_files = [".pcl"],
+            allow_files = [".pkl"],
         ),
         "deps": attr.label_list(
             providers = [
-                [PclFileInfo],
+                [PklFileInfo],
             ],
         ),
         "data": attr.label_list(

@@ -3,27 +3,27 @@ load("@io_bazel_stardoc//stardoc:stardoc.bzl", "stardoc")
 stardoc(
     name = "build-rules",
     out = "build-rules.md",
-    input = "//pcl:defs.bzl",
+    input = "//pkl:defs.bzl",
     symbol_names = [
-        "pcl_config_java_library",
-        "pcl_config_src",
-        "pcl_doc",
-        "pcl_library",
-        "pcl_run",
-        "pcl_test",
+        "pkl_config_java_library",
+        "pkl_config_src",
+        "pkl_doc",
+        "pkl_library",
+        "pkl_run",
+        "pkl_test",
     ],
     deps = [
-        "//pcl:docs",
+        "//pkl:docs",
     ],
 )
 
 stardoc(
     name = "workspace-rules",
     out = "workspace-rules.md",
-    input = "//pcl:workspace.bzl",
+    input = "//pkl:workspace.bzl",
     deps = [
-        "//pcl:docs",
-        "@pcl_constants//:docs",
+        "//pkl:docs",
+        "@pkl_constants//:docs",
     ],
 )
 

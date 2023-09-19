@@ -1,7 +1,7 @@
-def _pcl_doc_impl(ctx):
+def _pkl_doc_impl(ctx):
     modules = [module.path for module in ctx.files.deps]
 
-    # Generate HTML from Pcl
+    # Generate HTML from Pkl
 
     outfile = ctx.outputs.out
     if outfile == None:
@@ -9,7 +9,7 @@ def _pcl_doc_impl(ctx):
 
     outdir_path = outfile.path + ".tmpdir"
     command = "{executable} -o {output}".format(
-        executable = ctx.executable._pcl_doc_cli.path,
+        executable = ctx.executable._pkl_doc_cli.path,
         output = outdir_path,
     )
     if modules:
@@ -29,27 +29,27 @@ def _pcl_doc_impl(ctx):
         command = command,
         inputs = ctx.files.deps + ctx.files.srcs,
         outputs = [outfile],
-        tools = [ctx.executable._pcl_doc_cli, ctx.executable._zip],
-        progress_message = "Generating Pcl docs",
+        tools = [ctx.executable._pkl_doc_cli, ctx.executable._zip],
+        progress_message = "Generating Pkl docs",
     )
 
     return OutputGroupInfo(out = [outfile])
 
-_pcl_doc = rule(
-    _pcl_doc_impl,
+_pkl_doc = rule(
+    _pkl_doc_impl,
     attrs = {
         "srcs": attr.label_list(
             mandatory = True,
-            allow_files = [".pcl"],
+            allow_files = [".pkl"],
         ),
         "deps": attr.label_list(
             mandatory = False,
-            allow_files = [".pcl"],
+            allow_files = [".pkl"],
         ),
         "out": attr.output(),
-        "_pcl_doc_cli": attr.label(
+        "_pkl_doc_cli": attr.label(
             cfg = "exec",
-            default = "//pcl:pcl_doc_cli",
+            default = "//pkl:pkl_doc_cli",
             executable = True,
         ),
         "_zip": attr.label(
@@ -61,10 +61,10 @@ _pcl_doc = rule(
     },
 )
 
-def pcl_doc(name, srcs, **kwargs):
+def pkl_doc(name, srcs, **kwargs):
     if "out" not in kwargs:
         kwargs["out"] = name + "_docs.zip"
-    _pcl_doc(
+    _pkl_doc(
         name = name,
         srcs = srcs,
         **kwargs

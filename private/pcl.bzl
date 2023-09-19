@@ -1,10 +1,10 @@
-load("//pcl/private:providers.bzl", "PclFileInfo")
+load("//pkl/private:providers.bzl", "PklFileInfo")
 
-# A set of JVM flags to use when running Pcl rules on the RBE and with the federation.
-PCL_JVM_FLAGS = [
+# A set of JVM flags to use when running Pkl rules on the RBE and with the federation.
+PKL_JVM_FLAGS = [
     # By default, the JVM sets this to 25% but our RBE nodes have 4GiB memory.
     "-XX:MaxRAMPercentage=80.0",
-    # Pcl configurations that creates large data structures that are operated on and amended repeatedly,
+    # Pkl configurations that creates large data structures that are operated on and amended repeatedly,
     # can use a lot of available memory.
     #
     # Reclaim these large structures eagerly rather than waiting for a GC ratio/threshold to be hit.
@@ -15,7 +15,7 @@ PCL_JVM_FLAGS = [
     "-XX:MinHeapFreeRatio=10",
 ]
 
-def _write_pcl_script(ctx, in_runfiles):
+def _write_pkl_script(ctx, in_runfiles):
     is_java_executor = ctx.attr.executor == "java"
 
     # build executable command
@@ -23,28 +23,28 @@ def _write_pcl_script(ctx, in_runfiles):
     # Add extra jvm_flags if necessary
     if is_java_executor:
         jvm_flags = " ".join(["--jvm_flag=%s" % flag for flag in ctx.attr.jvm_flags])
-        executable = ctx.executable._pcl_java_cli
+        executable = ctx.executable._pkl_java_cli
     else:
         jvm_flags = ""
-        executable = ctx.executable._pcl_cli
+        executable = ctx.executable._pkl_cli
 
     # Build a forest of symlinks. Why do we need to this? It's because
-    # rdar://107049641 means that when we execute the Pcl, the cache
+    # rdar://107049641 means that when we execute the Pkl, the cache
     # directory cannot be below the working directory of the script
-    # because when Pcl searches for dependencies, it effectively does
+    # because when Pkl searches for dependencies, it effectively does
     # a glob of the current working directory, and if the cache is
     # there then denormalised applehub URIs won't resolve properly.
     working_dir = "%s/work" % ctx.label.name
     cache_dir = "%s/cache" % ctx.label.name
 
-    # A map of {file: path_to_pcl_in_symlinks}
+    # A map of {file: path_to_pkl_in_symlinks}
     symlinks = {}
 
     all_files = depset(transitive = [f[DefaultInfo].files for f in ctx.attr.srcs + ctx.attr.deps + ctx.attr.data]).to_list()
     for file in all_files:
         symlinks[file] = "%s/%s" % (working_dir, file.short_path)
 
-    file_infos = [dep[PclFileInfo] for dep in ctx.attr.srcs + ctx.attr.deps if PclFileInfo in dep]
+    file_infos = [dep[PklFileInfo] for dep in ctx.attr.srcs + ctx.attr.deps if PklFileInfo in dep]
     for info in file_infos:
         for file in info.dep_files.to_list():
             symlinks[file] = "%s/%s" % (working_dir, file.short_path)
@@ -67,16 +67,16 @@ def _write_pcl_script(ctx, in_runfiles):
 
     symlinks_json_file = ctx.actions.declare_file(ctx.label.name + "_symlinks.json")
     ctx.actions.write(output = symlinks_json_file, content = json.encode(path_to_symlink_target))
-    pcl_symlink_tool = ctx.executable._pcl_symlink_tool
+    pkl_symlink_tool = ctx.executable._pkl_symlink_tool
 
     cmd = """#!/usr/bin/env bash
 
 # Create symlinks from the output root to the current folder.
-# This allows Pcl to consume generated files.
+# This allows Pkl to consume generated files.
 {symlinks_executable} {symlinks_json_file_path}
 ret=$?
 if [[ $ret != 0 ]]; then
-    echo "Failed creating dependency symlinks in Pcl rule setup." >&2
+    echo "Failed creating dependency symlinks in Pkl rule setup." >&2
     exit 1
 fi
 
@@ -89,7 +89,7 @@ fi
 output=$({executable} {jvm_flags} {format_args} {properties} {expression_args} --working-dir {working_dir} --cache-dir "../cache" "${{output_args[@]}}" {entrypoints})
 ret=$?
 if [[ $ret != 0 ]]; then
-    echo "Failed processing PCL configuration with entrypoint(s) '{entrypoints}' (PWD: $(pwd)):" >&2
+    echo "Failed processing PKL configuration with entrypoint(s) '{entrypoints}' (PWD: $(pwd)):" >&2
     echo "${{output}}"
     exit 1
 fi
@@ -110,7 +110,7 @@ exit 1
         entrypoints = " ".join([f.path for f in (ctx.files.entrypoints or ctx.files.srcs)]),
         output_path_flag_name = "--multiple-file-output-path" if getattr(ctx.attr, "multiple_outputs", False) else "--output-path",
         symlinks_json_file_path = symlinks_json_file.short_path if in_runfiles else symlinks_json_file.path,
-        symlinks_executable = pcl_symlink_tool.short_path if in_runfiles else pcl_symlink_tool.path,
+        symlinks_executable = pkl_symlink_tool.short_path if in_runfiles else pkl_symlink_tool.path,
         working_dir = working_dir,
     )
 
@@ -122,17 +122,17 @@ exit 1
         is_executable = True,
     )
 
-    dep_files = [ctx.attr._pcl_symlink_tool[DefaultInfo].files]
+    dep_files = [ctx.attr._pkl_symlink_tool[DefaultInfo].files]
     for dep in ctx.attr.deps:
-        dep_files += [dep.files, dep[PclFileInfo].dep_files]
+        dep_files += [dep.files, dep[PklFileInfo].dep_files]
 
     if len(ctx.files.srcs) + len(dep_files) == 0:
-        fail("{}: Cannot run pcl with no srcs or deps".format(ctx.label))
+        fail("{}: Cannot run pkl with no srcs or deps".format(ctx.label))
 
     if is_java_executor:
-        dep_files.append(ctx.attr._pcl_java_cli[DefaultInfo].files)
+        dep_files.append(ctx.attr._pkl_java_cli[DefaultInfo].files)
     else:
-        dep_files.append(ctx.attr._pcl_cli[DefaultInfo].files)
+        dep_files.append(ctx.attr._pkl_cli[DefaultInfo].files)
 
     for dep in ctx.attr.data:
         dep_files.append(dep[DefaultInfo].files)
@@ -141,79 +141,79 @@ exit 1
         files = [script, symlinks_json_file] + symlinks.keys(),
         transitive_files = depset(transitive = dep_files),
     ).merge(
-        ctx.attr._pcl_symlink_tool[DefaultInfo].default_runfiles,
+        ctx.attr._pkl_symlink_tool[DefaultInfo].default_runfiles,
     )
 
     if is_java_executor:
-        runfiles = runfiles.merge(ctx.attr._pcl_java_cli[DefaultInfo].default_runfiles)
+        runfiles = runfiles.merge(ctx.attr._pkl_java_cli[DefaultInfo].default_runfiles)
 
     return script, runfiles
 
-_PCL_RUN_ATTRS = {
+_PKL_RUN_ATTRS = {
     "srcs": attr.label_list(
-        allow_files = [".pcl"],
+        allow_files = [".pkl"],
     ),
     "data": attr.label_list(
         allow_files = True,
         doc = "Files to make available in the filesystem when building this configuration. These can be accessed by relative path.",
     ),
     "deps": attr.label_list(
-        doc = "Other targets to include in the pcl module path when building this configuration. Must be `pcl_*` targets.",
+        doc = "Other targets to include in the pkl module path when building this configuration. Must be `pkl_*` targets.",
         providers = [
-            [PclFileInfo],
+            [PklFileInfo],
         ],
     ),
     "entrypoints": attr.label_list(
-        allow_files = [".pcl"],
-        doc = "The pcl file to use as an entry point (needs to be part of the srcs). Typically a single file.",
+        allow_files = [".pkl"],
+        doc = "The pkl file to use as an entry point (needs to be part of the srcs). Typically a single file.",
     ),
     "expression": attr.string(
-        doc = "A pcl expression to evaluate within the module. Note that the `format` attribute does not affect how this renders.",
+        doc = "A pkl expression to evaluate within the module. Note that the `format` attribute does not affect how this renders.",
     ),
     "format": attr.string(
-        doc = "The format of the generated file to pass when calling `pcl`. See https://pages.github.pie.apple.com/pcl/main/current/pcl-cli/index.html#options.",
+        doc = "The format of the generated file to pass when calling `pkl`. See https://pages.github.pie.apple.com/pkl/main/current/pkl-cli/index.html#options.",
     ),
     "multiple_outputs": attr.bool(
-        doc = "Whether to expect to render multiple file outputs to a single directory with the name of the target (see https://pcl.apple.com/main/current/language-reference/index.html#multiple-file-output). This flag is mutually exclusive with the `out` attribute.",
+        doc = "Whether to expect to render multiple file outputs to a single directory with the name of the target (see https://pkl.apple.com/main/current/language-reference/index.html#multiple-file-output). This flag is mutually exclusive with the `out` attribute.",
     ),
     "out": attr.output(
         doc = "Name of the output file to generate. Defaults to `<rule name>.<format>`. If the format attribute is unset, use `<rule name>.pcf`. This flag is mutually exclusive with the `multiple_outputs` attribute.",
     ),
     "properties": attr.string_dict(
-        doc = """Dictionary of name value pairs used to pass in PCL external properties
-        See the Pcl docs: https://pages.github.pie.apple.com/pcl/main/current/language-reference/index.html#resources""",
+        doc = """Dictionary of name value pairs used to pass in PKL external properties
+        See the Pkl docs: https://pages.github.pie.apple.com/pkl/main/current/language-reference/index.html#resources""",
     ),
     "executor": attr.string(
         default = "native",
         values = ["java", "native"],
-        doc = "Pcl executor to be used. One of: `java`, `native` (default)",
+        doc = "Pkl executor to be used. One of: `java`, `native` (default)",
     ),
     "jvm_flags": attr.string_list(
-        doc = """Optional list of flags to pass to the java process running Pcl. Only used if `executor` is `java`""",
+        doc = """Optional list of flags to pass to the java process running Pkl. Only used if `executor` is `java`""",
     ),
-    "_pcl_cli": attr.label(
+    "_pkl_cli": attr.label(
         allow_single_file = True,
         cfg = "exec",
-        default = "//pcl:pcl_native_executable",
+        default = "//pkl:pkl_native_executable",
         executable = True,
     ),
-    "_pcl_java_cli": attr.label(
+    "_pkl_java_cli": attr.label(
         cfg = "exec",
-        default = "//pcl:pcl_java_executable",
+        default = "//pkl:pkl_java_executable",
         executable = True,
     ),
-    "_pcl_symlink_tool": attr.label(
+    "_pkl_symlink_tool": attr.label(
         cfg = "exec",
-        default = "//pcl/private/com/apple/federation/pcl/symlinks",
+        default = "//pkl/private/com/apple/federation/pkl/symlinks",
         executable = True,
     ),
 }
 
-def _pcl_run_impl(ctx):
-    script, runfiles = _write_pcl_script(ctx, in_runfiles = False)
+def _pkl_run_impl(ctx):
+    script, runfiles = _write_pkl_script(ctx, in_runfiles = False)
 
     if ctx.attr.out and ctx.attr.multiple_outputs:
-        fail("pcl_run: Can't specify both `multiple_outputs` and `out` for target {}".format(ctx.label))
+        fail("pkl_run: Can't specify both `multiple_outputs` and `out` for target {}".format(ctx.label))
 
     output_format = ctx.attr.format or "pcf"
     if ctx.attr.out == None:
@@ -232,26 +232,26 @@ def _pcl_run_impl(ctx):
         outputs = outputs,
         executable = script,
         tools = [
-            ctx.attr._pcl_java_cli[DefaultInfo].files_to_run if ctx.attr.executor == "java" else ctx.executable._pcl_cli,
-            ctx.attr._pcl_symlink_tool[DefaultInfo].files_to_run,
+            ctx.attr._pkl_java_cli[DefaultInfo].files_to_run if ctx.attr.executor == "java" else ctx.executable._pkl_cli,
+            ctx.attr._pkl_symlink_tool[DefaultInfo].files_to_run,
         ],
         arguments = [script_output.path],
-        mnemonic = "PclRun",
+        mnemonic = "PklRun",
     )
     return [DefaultInfo(files = depset(outputs), runfiles = ctx.runfiles(outputs))]
 
-pcl_run = rule(
-    implementation = _pcl_run_impl,
-    attrs = _PCL_RUN_ATTRS,
+pkl_run = rule(
+    implementation = _pkl_run_impl,
+    attrs = _PKL_RUN_ATTRS,
 )
 
-def _pcl_test_impl(ctx):
-    """Test that a pcl file compiles without errors."""
-    script, runfiles = _write_pcl_script(ctx, in_runfiles = True)
+def _pkl_test_impl(ctx):
+    """Test that a pkl file compiles without errors."""
+    script, runfiles = _write_pkl_script(ctx, in_runfiles = True)
     return [DefaultInfo(executable = script, runfiles = runfiles)]
 
-pcl_test = rule(
-    implementation = _pcl_test_impl,
-    attrs = _PCL_RUN_ATTRS,
+pkl_test = rule(
+    implementation = _pkl_test_impl,
+    attrs = _PKL_RUN_ATTRS,
     test = True,
 )

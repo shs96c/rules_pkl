@@ -1,11 +1,11 @@
-package com.apple.federation.pcl.locks;
+package com.apple.federation.pkl.locks;
 
 import java.io.IOException;
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;
 import java.net.ProxySelector;
 import java.net.URI;
-import java.net.http.HttpClient;
+import java.net.http.Httpklient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
@@ -13,15 +13,15 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
 
-import static java.net.http.HttpClient.Redirect.ALWAYS;
+import static java.net.http.Httpklient.Redirect.ALWAYS;
 
 public class Downloader {
 
-    private final HttpClient client;
+    private final Httpklient client;
 
     public Downloader(Netrc netrc) {
-        HttpClient.Builder builder =
-            HttpClient.newBuilder()
+        Httpklient.Builder builder =
+            Httpklient.newBuilder()
                 .connectTimeout(Duration.ofSeconds(300))
                 .followRedirects(ALWAYS)
                 .proxy(ProxySelector.getDefault());
@@ -45,11 +45,11 @@ public class Downloader {
     public Path download(URI uri) throws IOException {
         HttpRequest request = HttpRequest.newBuilder(uri)
             .GET()
-            .header("User-Agent", "Apple Federation rules_pcl")
+            .header("User-Agent", "Apple Federation rules_pkl")
             .timeout(Duration.ofMinutes(10))
             .build();
 
-        Path file = Files.createTempFile("module", "pcl");
+        Path file = Files.createTempFile("module", "pkl");
 
         try {
             HttpResponse.BodyHandler<Path> handler = BodyHandlers.ofFile(file);
