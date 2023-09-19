@@ -1,0 +1,44 @@
+load("@io_bazel_stardoc//stardoc:stardoc.bzl", "stardoc")
+
+stardoc(
+    name = "build-rules",
+    out = "build-rules.md",
+    input = "//pcl:defs.bzl",
+    symbol_names = [
+        "pcl_config_java_library",
+        "pcl_config_src",
+        "pcl_doc",
+        "pcl_library",
+        "pcl_run",
+        "pcl_test",
+    ],
+    deps = [
+        "//pcl:docs",
+    ],
+)
+
+stardoc(
+    name = "workspace-rules",
+    out = "workspace-rules.md",
+    input = "//pcl:workspace.bzl",
+    deps = [
+        "//pcl:docs",
+        "@pcl_constants//:docs",
+    ],
+)
+
+genrule(
+    name = "stardoc",
+    srcs = [
+        "README-preamble.md",
+        "apple_rules_header.md",
+        ":build-rules.md",
+        ":workspace-rules.md",
+    ],
+    outs = ["README.md"],
+    cmd = """cat \
+        $(location :README-preamble.md) \
+        $(location :apple_rules_header.md) \
+        $(location :workspace-rules.md) \
+        $(location :build-rules.md) > $@""",
+)

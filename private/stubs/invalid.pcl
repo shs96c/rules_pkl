@@ -1,0 +1,7 @@
+magicNumber = 42
+
+local localNumber = 3
+
+someStruct {
+    structNumber = localNumberTypo
+}

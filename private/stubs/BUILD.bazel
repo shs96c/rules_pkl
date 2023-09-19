@@ -1,0 +1,12 @@
+load("//pcl/private:pcl.bzl", "pcl_test")
+
+pcl_test(
+    name = "should-pass",
+    srcs = [":valid.pcl"],
+)
+
+pcl_test(
+    name = "should-fail",
+    srcs = [":invalid.pcl"],
+    tags = ["manual"],
+)
