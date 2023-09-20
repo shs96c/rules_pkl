@@ -15,7 +15,7 @@ bazel_dep(name = "aspect_bazel_lib", version = "1.32.1", dev_dependency = True)
 bazel_dep(name = "buildifier_prebuilt", version = "6.1.0", dev_dependency = True)
 
 pkl = use_extension("//pkl:extensions.bzl", "pkl")
-pkl.toolchain(pkl_version = "1.14.2")
+pkl.toolchain(pkl_version = "0.24.0")
 use_repo(pkl, "pkl_toolchains")
 
 register_toolchains("@pkl_toolchains//:all")
