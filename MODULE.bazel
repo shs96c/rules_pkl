@@ -1,7 +1,7 @@
 "Bazel dependencies"
 
 module(
-    name = "org_pkl-lang_rules_pkl",
+    name = "rules_pkl",
     version = "0.0.0",
     compatibility_level = 1,
 )

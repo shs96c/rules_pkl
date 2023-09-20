@@ -15,6 +15,5 @@
 
 # Bazel
 /bazel-*
-/examples/*/bazel-*
+/example/*/bazel-*
 /tests/*/bazel-*
-

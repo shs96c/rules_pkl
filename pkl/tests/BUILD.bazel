@@ -1,6 +1,0 @@
-load(":versions_test.bzl", "versions_test_suite")
-load(":pkl_run_test.bzl", "pkl_run_test_suite")
-
-versions_test_suite(name = "versions_test")
-
-pkl_run_test_suite(name = "pkl_run_test")
