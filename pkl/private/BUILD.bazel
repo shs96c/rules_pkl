@@ -17,3 +17,9 @@ bzl_library(
     srcs = ["resolved_toolchain.bzl"],
     visibility = ["//pkl:__subpackages__"],
 )
+
+bzl_library(
+    name = "pkl",
+    srcs = ["pkl.bzl"],
+    visibility = ["//pkl:__subpackages__"],
+)
