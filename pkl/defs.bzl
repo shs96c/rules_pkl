@@ -5,6 +5,4 @@ load(
     _pkl_run = "pkl_run",
 )
 
-def example():
-    """This is an example"""
-    pass
+pkl_run = _pkl_run
