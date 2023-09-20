@@ -1,10 +1,8 @@
-# This load statement must be in the docs/ package rather than anything users depend on
-# so that the dependency on stardoc doesn't leak to them.
-load("@aspect_bazel_lib//lib:docs.bzl", "stardoc_with_diff_test", "update_docs")
+load("@stardoc//stardoc:stardoc.bzl", "stardoc")
 
-stardoc_with_diff_test(
-    name = "rules",
-    bzl_library_target = "//pkl:defs",
+stardoc(
+    name = "docs",
+    out = "rules_pkl_doc.md",
+    input = "//pkl:defs.bzl",
+    deps = ["//pkl:docs"],
 )
-
-update_docs(name = "update")
