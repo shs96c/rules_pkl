@@ -6,13 +6,31 @@ module(
     compatibility_level = 1,
 )
 
-bazel_dep(name = "bazel_skylib", version = "1.4.1")
-bazel_dep(name = "platforms", version = "0.0.5")
+bazel_dep(name = "bazel_skylib", version = "1.4.2")
+bazel_dep(name = "rules_jvm_external", version = "5.3")
 
 pkl = use_extension("//pkl:extensions.bzl", "pkl")
 use_repo(
     pkl,
     "pkl-cli-macos",
+)
+
+register_toolchains("@rules_pkl//pkl:default-toolchain")
+
+maven = use_extension("@rules_jvm_external//:extensions.bzl", "maven")
+
+maven.install(
+    name = "rules_pkl_deps",
+    artifacts = [
+        "com.google.code.gson:gson:2.10.1",
+    ],
+    lock_file = "//pkl/private:pkl_deps_install.json",
+)
+
+use_repo(
+    maven,
+    "rules_pkl_deps",
+    "unpinned_rules_pkl_deps",
 )
 
 bazel_dep(name = "bazel_skylib_gazelle_plugin", version = "1.4.1", dev_dependency = True)

@@ -1,18 +1,21 @@
-load("providers.bzl", "PklFileInfo")
+load(":providers.bzl", "PklFileInfo")
 
 def _write_pkl_script(ctx, in_runfiles):
     is_java_executor = False
 
     # build executable command
     jvm_flags = ""
-    executable = ctx.executable._pkl_cli
+
+    pkl_toolchain = ctx.toolchains["//pkl:toolchain_type"]
+
+    executable = pkl_toolchain.cli
 
     # Build a forest of symlinks. Why do we need to this? It's because
-    # rdar://107049641 means that when we execute the Pkl, the cache
-    # directory cannot be below the working directory of the script
-    # because when Pkl searches for dependencies, it effectively does
-    # a glob of the current working directory, and if the cache is
-    # there then denormalised applehub URIs won't resolve properly.
+    # when we execute the Pkl, the cache directory cannot be below the
+    # working directory of the script because when Pkl searches for
+    # dependencies, it effectively does a glob of the current working
+    # directory, and if the cache is there then denormalised dependency
+    # URIs won't resolve properly.
     working_dir = "%s/work" % ctx.label.name
     cache_dir = "%s/cache" % ctx.label.name
 
@@ -46,7 +49,7 @@ def _write_pkl_script(ctx, in_runfiles):
 
     symlinks_json_file = ctx.actions.declare_file(ctx.label.name + "_symlinks.json")
     ctx.actions.write(output = symlinks_json_file, content = json.encode(path_to_symlink_target))
-    pkl_symlink_tool = ctx.executable._pkl_symlink_tool
+    pkl_symlink_tool = pkl_toolchain.symlink_tool
 
     cmd = """#!/usr/bin/env bash
 
@@ -65,7 +68,7 @@ else
     output_args=()
 fi
 
-output=$({executable} {jvm_flags} {format_args} {properties} {expression_args} --working-dir {working_dir} --cache-dir "../cache" "${{output_args[@]}}" {entrypoints})
+output=$({executable} {jvm_flags} eval {format_args} {properties} {expression_args} --working-dir {working_dir} --cache-dir "../cache" "${{output_args[@]}}" {entrypoints})
 ret=$?
 if [[ $ret != 0 ]]; then
     echo "Failed processing PKL configuration with entrypoint(s) '{entrypoints}' (PWD: $(pwd)):" >&2
@@ -101,14 +104,12 @@ exit 1
         is_executable = True,
     )
 
-    dep_files = [ctx.attr._pkl_symlink_tool[DefaultInfo].files]
+    dep_files = []
     for dep in ctx.attr.deps:
         dep_files += [dep.files, dep[PklFileInfo].dep_files]
 
     if len(ctx.files.srcs) + len(dep_files) == 0:
         fail("{}: Cannot run pkl with no srcs or deps".format(ctx.label))
-
-    dep_files.append(ctx.attr._pkl_cli[DefaultInfo].files)
 
     for dep in ctx.attr.data:
         dep_files.append(dep[DefaultInfo].files)
@@ -116,8 +117,6 @@ exit 1
     runfiles = ctx.runfiles(
         files = [script, symlinks_json_file] + symlinks.keys(),
         transitive_files = depset(transitive = dep_files),
-    ).merge(
-        ctx.attr._pkl_symlink_tool[DefaultInfo].default_runfiles,
     )
 
     return script, runfiles
@@ -126,41 +125,41 @@ _PKL_RUN_ATTRS = {
     "srcs": attr.label_list(
         allow_files = [".pkl"],
     ),
-    #    "data": attr.label_list(
-    #        allow_files = True,
-    #        doc = "Files to make available in the filesystem when building this configuration. These can be accessed by relative path.",
-    #    ),
-    #    "deps": attr.label_list(
-    #        doc = "Other targets to include in the pkl module path when building this configuration. Must be `pkl_*` targets.",
-    #        providers = [
-    #            [PklFileInfo],
-    #        ],
-    #    ),
-    #    "entrypoints": attr.label_list(
-    #        allow_files = [".pkl"],
-    #        doc = "The pkl file to use as an entry point (needs to be part of the srcs). Typically a single file.",
-    #    ),
-    #    "expression": attr.string(
-    #        doc = "A pkl expression to evaluate within the module. Note that the `format` attribute does not affect how this renders.",
-    #    ),
-    #    "format": attr.string(
-    #        doc = "The format of the generated file to pass when calling `pkl`. See https://pages.github.pie.apple.com/pkl/main/current/pkl-cli/index.html#options.",
-    #    ),
-    #    "multiple_outputs": attr.bool(
-    #        doc = "Whether to expect to render multiple file outputs to a single directory with the name of the target (see https://pkl.apple.com/main/current/language-reference/index.html#multiple-file-output). This flag is mutually exclusive with the `out` attribute.",
-    #    ),
-    #    "out": attr.output(
-    #        doc = "Name of the output file to generate. Defaults to `<rule name>.<format>`. If the format attribute is unset, use `<rule name>.pcf`. This flag is mutually exclusive with the `multiple_outputs` attribute.",
-    #    ),
-    #    "properties": attr.string_dict(
-    #        doc = """Dictionary of name value pairs used to pass in PKL external properties
-    #        See the Pkl docs: https://pages.github.pie.apple.com/pkl/main/current/language-reference/index.html#resources""",
-    #    ),
-    #    "executor": attr.string(
-    #        default = "native",
-    #        values = ["java", "native"],
-    #        doc = "Pkl executor to be used. One of: `java`, `native` (default)",
-    #    ),
+    "data": attr.label_list(
+        allow_files = True,
+        doc = "Files to make available in the filesystem when building this configuration. These can be accessed by relative path.",
+    ),
+    "deps": attr.label_list(
+        doc = "Other targets to include in the pkl module path when building this configuration. Must be `pkl_*` targets.",
+        providers = [
+            [PklFileInfo],
+        ],
+    ),
+    "entrypoints": attr.label_list(
+        allow_files = [".pkl"],
+        doc = "The pkl file to use as an entry point (needs to be part of the srcs). Typically a single file.",
+    ),
+    "expression": attr.string(
+        doc = "A pkl expression to evaluate within the module. Note that the `format` attribute does not affect how this renders.",
+    ),
+    "format": attr.string(
+        doc = "The format of the generated file to pass when calling `pkl`. See https://pages.github.pie.apple.com/pkl/main/current/pkl-cli/index.html#options.",
+    ),
+    "multiple_outputs": attr.bool(
+        doc = "Whether to expect to render multiple file outputs to a single directory with the name of the target (see https://pkl.apple.com/main/current/language-reference/index.html#multiple-file-output). This flag is mutually exclusive with the `out` attribute.",
+    ),
+    "out": attr.output(
+        doc = "Name of the output file to generate. Defaults to `<rule name>.<format>`. If the format attribute is unset, use `<rule name>.pcf`. This flag is mutually exclusive with the `multiple_outputs` attribute.",
+    ),
+    "properties": attr.string_dict(
+        doc = """Dictionary of name value pairs used to pass in PKL external properties
+            See the Pkl docs: https://pages.github.pie.apple.com/pkl/main/current/language-reference/index.html#resources""",
+    ),
+    #        "executor": attr.string(
+    #            default = "native",
+    #            values = ["java", "native"],
+    #            doc = "Pkl executor to be used. One of: `java`, `native` (default)",
+    #        ),
     #    "jvm_flags": attr.string_list(
     #        doc = """Optional list of flags to pass to the java process running Pkl. Only used if `executor` is `java`""",
     #    ),
@@ -200,13 +199,15 @@ def _pkl_run_impl(ctx):
 
     outputs = [script_output]
 
+    pkl_toolchain = ctx.toolchains["//pkl:toolchain_type"]
+
     result = ctx.actions.run(
         inputs = runfiles.files,
         outputs = outputs,
         executable = script,
         tools = [
-            ctx.attr._pkl_java_cli[DefaultInfo].files_to_run if ctx.attr.executor == "java" else ctx.executable._pkl_cli,
-            ctx.attr._pkl_symlink_tool[DefaultInfo].files_to_run,
+            pkl_toolchain.cli_files_to_run,
+            pkl_toolchain.symlink_files_to_run,
         ],
         arguments = [script_output.path],
         mnemonic = "PklRun",
@@ -214,6 +215,9 @@ def _pkl_run_impl(ctx):
     return [DefaultInfo(files = depset(outputs), runfiles = ctx.runfiles(outputs))]
 
 pkl_run = rule(
-    implementation = _pkl_run_impl,
+    _pkl_run_impl,
     attrs = _PKL_RUN_ATTRS,
+    toolchains = [
+        "//pkl:toolchain_type",
+    ],
 )

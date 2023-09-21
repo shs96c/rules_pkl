@@ -1,2 +1,2 @@
+common --enable_bzlmod
 test --test_output=all
-build --enable_bzlmod
