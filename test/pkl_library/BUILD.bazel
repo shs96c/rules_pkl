@@ -1,0 +1,30 @@
+load("//pkl:defs.bzl", "pkl_library")
+load("@pip//:requirements.bzl", "requirement")
+
+pkl_library(
+    name = "animals",
+    srcs = ["srcs/animals.pkl"],
+)
+
+pkl_library(
+    name = "horse",
+    srcs = ["srcs/horse.pkl"],
+    deps = [":animals"],
+)
+
+filegroup(
+    name = "transitive_sources",
+    srcs = [":horse"],
+    output_group = "pkl_sources",
+)
+
+py_test(
+    name = "test_transitive_sources",
+    srcs = ["test_transitive_sources.py"],
+    data = [
+        ":transitive_sources",
+    ],
+    deps = [
+        requirement("bazel-runfiles"),
+    ],
+)
