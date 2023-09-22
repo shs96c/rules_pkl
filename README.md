@@ -1,45 +1,28 @@
-# Bazel rules for Pkl
+# Pkl Rules
 
-Features:
+[Pkl](www.pkl-lang.org) is an embeddable configuration language with rich support for data templating and
+validation. It can be used from the command line, integrated in a build pipeline, or embedded in a
+program. Pkl scales from small to large, simple to complex, ad-hoc to repetitive configuration
+tasks.
 
-- follows the official style guide at https://docs.bazel.build/versions/main/skylark/deploying.html
-- allows for both WORKSPACE.bazel and bzlmod (MODULE.bazel) usage
-- includes Bazel formatting as a pre-commit hook (using [buildifier])
-- includes stardoc API documentation generator
-- includes typical toolchain setup
-- CI configured with GitHub Actions
-- Release using GitHub Actions just by pushing a tag
+It can be used to specify and verify configuration, and to provide a well-defined
+schema for configuration that can be shared across components. It can also be used to generate
+configuration POJOs.
 
-See https://docs.bazel.build/versions/main/skylark/deploying.html#readme
+For further information about Pkl, check out the (official PKL documentation)[www.pkl-lang.org/main/current].
 
-[buildifier]: https://github.com/bazelbuild/buildtools/tree/master/buildifier#readme
+## Quick Start
 
-TODOs:
+### Setup
 
-1. if you don't need to fetch platform-dependent tools, then remove anything toolchain-related.
-1. update the `actions/cache@v2` bazel cache key in [.github/workflows/ci.yaml](.github/workflows/ci.yaml) and [.github/workflows/release.yml](.github/workflows/release.yml) to be a hash of your source files.
-1. (optional) install the [Renovate app](https://github.com/apps/renovate) to get auto-PRs to keep the dependencies up-to-date.
-1. delete this section of the README (everything up to the SNIP).
-1. Remove feature: CI configured with GitHub Actions
-1. Remove feature: Release using GitHub Actions just by pushing a tag
+To use `rules_pkl` enable `bzlmod` within your project, and then add the following to your `MODULE.bazel`:
 
----- SNIP ----
+```starlark
+# Please check the releases page on GitHub for the latest released version
+bazel_dep(name = "rules_pkl", version = "1.0.0")
+```
 
-# Bazel rules for pkl
+## Examples
 
-## Installation
+See the `example/` directory for complete examples of how to use `rules_pkl`.
 
-From the release you wish to use:
-<https://github.com/pkl-lang/rules_pkl/releases>
-copy the WORKSPACE snippet into your `WORKSPACE` file.
-
-To use a commit rather than a release, you can point at any SHA of the repo.
-
-For example to use commit `abc123`:
-
-1. Replace `url = "https://github.com/pkl-lang/rules_pkl/releases/download/v0.1.0/rules_pkl-v0.1.0.tar.gz"` with a GitHub-provided source archive like `url = "https://github.com/pkl-lang/rules_pkl/archive/abc123.tar.gz"`
-1. Replace `strip_prefix = "rules_pkl-0.1.0"` with `strip_prefix = "rules_pkl-abc123"`
-1. Update the `sha256`. The easiest way to do this is to comment out the line, then Bazel will
-   print a message with the correct value. Note that GitHub source archives don't have a strong
-   guarantee on the sha256 stability, see
-   <https://github.blog/2023-02-21-update-on-the-future-stability-of-source-code-archives-and-hashes/>
