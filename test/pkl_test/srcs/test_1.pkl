@@ -1,0 +1,10 @@
+amends "pkl:test"
+
+import "cat.pkl"
+
+facts {
+    ["cat attributes are correct"] {
+        cat.WhiskersCount == 6
+        cat.CatName == "Puddles"
+    }
+}

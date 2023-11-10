@@ -4,4 +4,7 @@ bzl_library(
     name = "docs",
     srcs = glob(["*.bzl"]),
     visibility = ["//pkl:__subpackages__"],
+    deps = [
+        "@rules_jvm_external//:implementation",
+    ],
 )

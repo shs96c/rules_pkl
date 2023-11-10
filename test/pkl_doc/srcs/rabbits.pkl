@@ -1,0 +1,15 @@
+/// An Animal
+module com.animals.Rabbits
+
+/// An animal.
+///
+/// Has [name] property
+class Animal {
+    /// The nam of the animal
+    name: String
+}
+
+/// An individual animal
+peter: Animal = new {
+    name = "Peter"
+}

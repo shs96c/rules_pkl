@@ -1,0 +1,10 @@
+/// City of Bedrock, proud home of the [Flintstones].
+amends "pkl:DocPackageInfo"
+
+import "rabbits.pkl"
+
+name = "com.animals"
+version = "1.2.3"
+importUri = "https:artifacts.apple.com/pkl/pkl/"
+sourceCode = "github.com/"
+issueTracker = "issues.com/"

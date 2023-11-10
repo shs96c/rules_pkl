@@ -1,0 +1,23 @@
+load("//pkl:defs.bzl", "pkl_run", "pkl_test", "pkl_test_suite")
+
+pkl_test(
+    name = "pkl_test_1",
+    srcs = ["srcs/test_1.pkl"],
+    data = ["srcs/cat.pkl"],
+)
+
+pkl_run(
+    name = "pkl_run_1",
+    srcs = ["srcs/test_1.pkl"],
+    data = ["srcs/cat.pkl"],
+)
+
+pkl_test(
+    name = "pkl_test_2",
+    srcs = ["srcs/test_2.pkl"],
+)
+
+pkl_test_suite(
+    name = "test",
+    srcs = glob(["*.pkl"]),
+)

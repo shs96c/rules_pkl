@@ -1,0 +1,20 @@
+load("//pkl:defs.bzl", "pkl_doc")
+
+pkl_doc(
+    name = "pkl_doc",
+    srcs = [
+        "srcs/doc-package-info.pkl",
+        "srcs/rabbits.pkl",
+    ],
+)
+
+py_test(
+    name = "pkl_doc_test",
+    srcs = ["pkl_doc_test.py"],
+    data = [
+        ":pkl_doc_docs.zip",
+    ],
+    deps = [
+        "@bazel_tools//tools/python/runfiles",
+    ],
+)

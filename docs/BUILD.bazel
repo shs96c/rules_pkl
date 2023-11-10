@@ -1,7 +1,7 @@
 load("@stardoc//stardoc:stardoc.bzl", "stardoc")
 
 stardoc(
-    name = "docs",
+    name = "implementation",
     out = "rules_pkl_doc.md",
     input = "//pkl:defs.bzl",
     deps = ["//pkl:docs"],

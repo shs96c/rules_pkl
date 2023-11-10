@@ -1,6 +1,6 @@
 load(":providers.bzl", "PklFileInfo")
 
-def _write_pkl_script(ctx, in_runfiles):
+def _write_pkl_script(ctx, in_runfiles, command):
     is_java_executor = False
 
     # build executable command
@@ -21,12 +21,12 @@ def _write_pkl_script(ctx, in_runfiles):
 
     # A map of {file: path_to_pkl_in_symlinks}
     symlinks = {}
-
     all_files = depset(transitive = [f[DefaultInfo].files for f in ctx.attr.srcs + ctx.attr.deps + ctx.attr.data]).to_list()
     for file in all_files:
         symlinks[file] = "%s/%s" % (working_dir, file.short_path)
 
     file_infos = [dep[PklFileInfo] for dep in ctx.attr.srcs + ctx.attr.deps if PklFileInfo in dep]
+
     for info in file_infos:
         for file in info.dep_files.to_list():
             symlinks[file] = "%s/%s" % (working_dir, file.short_path)
@@ -55,6 +55,7 @@ def _write_pkl_script(ctx, in_runfiles):
 
 # Create symlinks from the output root to the current folder.
 # This allows Pkl to consume generated files.
+
 {symlinks_executable} {symlinks_json_file_path}
 ret=$?
 if [[ $ret != 0 ]]; then
@@ -68,7 +69,7 @@ else
     output_args=()
 fi
 
-output=$({executable} {jvm_flags} eval {format_args} {properties} {expression_args} --working-dir {working_dir} --cache-dir "../cache" "${{output_args[@]}}" {entrypoints})
+output=$({executable} {jvm_flags} {command} {format_args} {properties} {expression_args} --working-dir {working_dir} --cache-dir "../cache" "${{output_args[@]}}" {entrypoints})
 ret=$?
 if [[ $ret != 0 ]]; then
     echo "Failed processing PKL configuration with entrypoint(s) '{entrypoints}' (PWD: $(pwd)):" >&2
@@ -94,6 +95,7 @@ exit 1
         symlinks_json_file_path = symlinks_json_file.short_path if in_runfiles else symlinks_json_file.path,
         symlinks_executable = pkl_symlink_tool.short_path if in_runfiles else pkl_symlink_tool.path,
         working_dir = working_dir,
+        command = command,
     )
 
     # write shell script
@@ -115,8 +117,8 @@ exit 1
         dep_files.append(dep[DefaultInfo].files)
 
     runfiles = ctx.runfiles(
-        files = [script, symlinks_json_file] + symlinks.keys(),
-        transitive_files = depset(transitive = dep_files),
+        files = [script, symlinks_json_file] + symlinks.keys() + [pkl_toolchain.cli],
+        transitive_files = depset(transitive = dep_files + [pkl_toolchain.symlink_default_runfiles.files, pkl_toolchain.cli_default_runfiles.files]),
     )
 
     return script, runfiles
@@ -182,7 +184,7 @@ _PKL_RUN_ATTRS = {
 }
 
 def _pkl_run_impl(ctx):
-    script, runfiles = _write_pkl_script(ctx, in_runfiles = False)
+    script, runfiles = _write_pkl_script(ctx, in_runfiles = False, command = "eval")
 
     if ctx.attr.out and ctx.attr.multiple_outputs:
         fail("pkl_run: Can't specify both `multiple_outputs` and `out` for target {}".format(ctx.label))
@@ -217,6 +219,19 @@ def _pkl_run_impl(ctx):
 pkl_run = rule(
     _pkl_run_impl,
     attrs = _PKL_RUN_ATTRS,
+    toolchains = [
+        "//pkl:toolchain_type",
+    ],
+)
+
+def _pkl_test_impl(ctx):
+    script, runfiles = _write_pkl_script(ctx, in_runfiles = True, command = "test")
+    return [DefaultInfo(executable = script, runfiles = runfiles)]
+
+pkl_test = rule(
+    implementation = _pkl_test_impl,
+    attrs = _PKL_RUN_ATTRS,
+    test = True,
     toolchains = [
         "//pkl:toolchain_type",
     ],

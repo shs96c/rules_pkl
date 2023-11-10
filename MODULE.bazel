@@ -15,18 +15,27 @@ use_repo(
     "pkl-cli-macos",
 )
 
-register_toolchains("@rules_pkl//pkl:default-toolchain")
+register_toolchains(
+    "@rules_pkl//pkl:default-toolchain",
+    "@rules_pkl//pkl:codegen-toolchain",
+)
 
 maven = use_extension("@rules_jvm_external//:extensions.bzl", "maven")
-
 maven.install(
     name = "rules_pkl_deps",
     artifacts = [
         "com.google.code.gson:gson:2.10.1",
+        "com.apple.pkl:pkl-codegen-java:0.24.6",
+        "com.apple.pkl:pkl-config-java:0.24.6",
+        "com.apple.pkl:pkl-tools:0.24.6",
+        "org.junit.vintage:junit-vintage-engine:5.7.0",
+        "com.apple.pkl:pkl-doc:0.24.6",
     ],
     lock_file = "//pkl/private:pkl_deps_install.json",
+    repositories = [
+        "https://artifacts.apple.com/libs-release",
+    ],
 )
-
 use_repo(
     maven,
     "rules_pkl_deps",
@@ -46,7 +55,6 @@ python.toolchain(
 )
 
 pip = use_extension("@rules_python//python/extensions:pip.bzl", "pip")
-
 pip.parse(
     hub_name = "pip",
     python_version = "3.11",

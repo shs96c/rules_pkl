@@ -1,0 +1,2 @@
+WhiskersCount: Int = 6
+CatName: String = "Puddles"
