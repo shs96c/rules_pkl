@@ -1,0 +1,58 @@
+@ModuleInfo { minPclVersion = "0.16.0" }
+amends "applehub:com.apple.rio.Rio:2f1d4a65"
+
+
+pipelines {
+    new {
+        branchName = "main"
+        machine {
+            baseImage = "docker.apple.com/acp/bazelw:latest"
+        }
+        build {
+            template = "freestyle:v4:prb"
+            steps {
+                // language=bash
+                """
+                bazel test ...
+                """
+            }
+        }
+    }
+
+    new {
+        branchName = "main"
+        machine {
+            baseImage = "docker.apple.com/acp/bazelw:latest"
+            env {
+                ["VERSION"] = "0.0.{}"
+            }
+        }
+        build {
+            template = "freestyle:v4:publish"
+            steps {
+                // language=bash
+                """
+                tar -cavf rules_pkl-$VERSION.tar.gz .
+
+                ci stage-lib "rules_pkl-$VERSION.tar.gz,bazel/rules/rules_pkl/"
+                """
+            }
+        }
+        package {
+            freeform {
+                new {
+                    publish {
+                        new {
+                            repo = "pie-devtools-local"
+                        }
+                    }
+                }
+            }
+        }
+        trigger {
+            gitPush = false
+        }
+    }
+}
+
+
