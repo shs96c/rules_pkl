@@ -6,13 +6,23 @@ module(
     compatibility_level = 1,
 )
 
-bazel_dep(name = "bazel_skylib", version = "1.4.2")
-bazel_dep(name = "rules_jvm_external", version = "5.3")
+bazel_dep(
+    name = "bazel_skylib",
+    version = "1.4.2",
+)
+
+bazel_dep(
+    name = "rules_jvm_external",
+    version = "5.3",
+)
 
 pkl = use_extension("//pkl:extensions.bzl", "pkl")
+
 use_repo(
     pkl,
     "pkl-cli-macos",
+    "pkl-cli-linux-aarch64",
+    "pkl-cli-linux-x86_64",
 )
 
 register_toolchains(
@@ -21,6 +31,7 @@ register_toolchains(
 )
 
 maven = use_extension("@rules_jvm_external//:extensions.bzl", "maven")
+
 maven.install(
     name = "rules_pkl_deps",
     artifacts = [
@@ -36,30 +47,60 @@ maven.install(
         "https://artifacts.apple.com/libs-release",
     ],
 )
+
 use_repo(
     maven,
     "rules_pkl_deps",
     "unpinned_rules_pkl_deps",
 )
 
-bazel_dep(name = "bazel_skylib_gazelle_plugin", version = "1.4.1", dev_dependency = True)
-bazel_dep(name = "buildifier_prebuilt", version = "6.1.0", dev_dependency = True)
-bazel_dep(name = "gazelle", version = "0.29.0", dev_dependency = True, repo_name = "bazel_gazelle")
-bazel_dep(name = "rules_python", version = "0.25.0", dev_dependency = True)
-bazel_dep(name = "stardoc", version = "0.6.2", dev_dependency = True)
+bazel_dep(
+    name = "bazel_skylib_gazelle_plugin",
+    version = "1.4.1",
+    dev_dependency = True,
+)
+
+bazel_dep(
+    name = "buildifier_prebuilt",
+    version = "6.1.0",
+    dev_dependency = True,
+)
+
+bazel_dep(
+    name = "gazelle",
+    version = "0.29.0",
+    dev_dependency = True,
+    repo_name = "bazel_gazelle",
+)
+
+bazel_dep(
+    name = "rules_python",
+    version = "0.25.0",
+    dev_dependency = True,
+)
+
+bazel_dep(
+    name = "stardoc",
+    version = "0.6.2",
+    dev_dependency = True,
+)
 
 python = use_extension("@rules_python//python/extensions:python.bzl", "python")
+
 python.toolchain(
     configure_coverage_tool = True,
+    ignore_root_user_error = True,
     python_version = "3.11",
 )
 
 pip = use_extension("@rules_python//python/extensions:pip.bzl", "pip")
+
 pip.parse(
     hub_name = "pip",
     python_version = "3.11",
     requirements_lock = "//test:requirements_lock.txt",
 )
+
 use_repo(
     pip,
     "pip",

@@ -64,8 +64,8 @@ alias(
     name = "pkl_cli",
     actual = select({
         "@bazel_tools//src/conditions:darwin_arm64": "@pkl-cli-macos//file",
-        "@bazel_tools//src/conditions:linux_aarch64": "@pkl-cli-linux//file",
-        "@bazel_tools//src/conditions:linux_x86_64": "@pkl-cli-linux//file",
+        "@bazel_tools//src/conditions:linux_aarch64": "@pkl-cli-linux-aarch64//file",
+        "@bazel_tools//src/conditions:linux_x86_64": "@pkl-cli-linux-x86_64//file",
     }),
     visibility = ["//visibility:public"],
 )
