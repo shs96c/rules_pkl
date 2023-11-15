@@ -1,15 +1,15 @@
 # Pkl Rules
 
-[Pkl](www.pkl-lang.org) is an embeddable configuration language with rich support for data templating and
+[Pkl][] is an embeddable configuration language with rich support for data templating and
 validation. It can be used from the command line, integrated in a build pipeline, or embedded in a
 program. Pkl scales from small to large, simple to complex, ad-hoc to repetitive configuration
 tasks.
 
-It can be used to specify and verify configuration, and to provide a well-defined
-schema for configuration that can be shared across components. It can also be used to generate
-configuration POJOs.
+For further information about Pkl, check out the [official PKL documentation][].
 
-For further information about Pkl, check out the (official PKL documentation)[www.pkl-lang.org/main/current].
+[official PKL documentation]: https://pkl.apple.com/main/current/index.html
+[pkl]: https://pkl.apple.com
+
 
 ## Quick Start
 
@@ -26,3 +26,6 @@ bazel_dep(name = "rules_pkl", version = "1.0.0")
 
 See the `example/` directory for complete examples of how to use `rules_pkl`.
 
+## Ruleset Docs
+For further information on the rules provided, check out [rules_pkl_doc]
+[rules_pkl_doc]: https://github.pie.apple.com/bazel-mirror/rules_pkl/blob/main/docs/rules_pkl_doc.md
