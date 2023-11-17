@@ -32,7 +32,7 @@ pipelines {
             steps {
                 // language=bash
                 """
-                tar -cavf rules_pkl-$VERSION.tar.gz .
+                tar -cavf rules_pkl-$VERSION.tar.gz --anchored --exclude-from .tar-exclude-from-file.conf *
 
                 ci stage-lib "rules_pkl-$VERSION.tar.gz,bazel/rules/rules_pkl/"
                 """
