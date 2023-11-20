@@ -24,7 +24,7 @@ pipelines {
         machine {
             baseImage = "docker.apple.com/acp/bazelw:latest"
             env {
-                ["VERSION"] = "0.0.{}"
+                ["VERSION"] = "0.0.#{}"
             }
         }
         build {
