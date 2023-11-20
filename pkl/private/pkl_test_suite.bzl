@@ -9,7 +9,6 @@ def pkl_test_suite(
         visibility = None,
         size = None,
         test_suffix = None,
-        executor = None,
         **kwargs):
     """Create a suite of pkl tests from the provided files.
 
@@ -53,7 +52,6 @@ def pkl_test_suite(
             size = size,
             deps = deps,
             tags = tags,
-            executor = executor,
             visibility = ["//visibility:private"],
             **kwargs
         )

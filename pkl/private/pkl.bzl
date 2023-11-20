@@ -1,8 +1,6 @@
 load(":providers.bzl", "PklFileInfo")
 
 def _write_pkl_script(ctx, in_runfiles, command):
-    is_java_executor = False
-
     # build executable command
     jvm_flags = ""
 
@@ -157,30 +155,6 @@ _PKL_RUN_ATTRS = {
         doc = """Dictionary of name value pairs used to pass in PKL external properties
             See the Pkl docs: https://pages.github.pie.apple.com/pkl/main/current/language-reference/index.html#resources""",
     ),
-    #        "executor": attr.string(
-    #            default = "native",
-    #            values = ["java", "native"],
-    #            doc = "Pkl executor to be used. One of: `java`, `native` (default)",
-    #        ),
-    #    "jvm_flags": attr.string_list(
-    #        doc = """Optional list of flags to pass to the java process running Pkl. Only used if `executor` is `java`""",
-    #    ),
-    #    "_pkl_cli": attr.label(
-    #        allow_single_file = True,
-    #        cfg = "exec",
-    #        default = "//pkl:pkl_native_executable",
-    #        executable = True,
-    #    ),
-    #    "_pkl_java_cli": attr.label(
-    #        cfg = "exec",
-    #        default = "//pkl:pkl_java_executable",
-    #        executable = True,
-    #    ),
-    #    "_pkl_symlink_tool": attr.label(
-    #        cfg = "exec",
-    #        default = "//pkl/private/com/apple/federation/pkl/symlinks",
-    #        executable = True,
-    #    ),
 }
 
 def _pkl_run_impl(ctx):
