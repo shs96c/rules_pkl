@@ -14,7 +14,7 @@ def pkl_cli_binaries():
 
     maybe(
         http_file,
-        name = "pkl-cli-linux-aarch64",
+        name = "pkl-cli-linux-arm64",
         url = "https://artifacts.apple.com/artifactory/pcl-release-local/com/apple/pkl/pkl-cli-linux-aarch64/0.24.6/pkl-cli-linux-aarch64-0.24.6.bin",
         sha256 = "7aae0eb3f9227ede086d34d687e720e1ce2df3b857d59bf2b69fb5896cb1c273",
         executable = True,

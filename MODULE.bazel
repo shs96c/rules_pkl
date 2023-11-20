@@ -21,14 +21,14 @@ pkl = use_extension("//pkl:extensions.bzl", "pkl")
 use_repo(
     pkl,
     "pkl-cli-macos",
-    "pkl-cli-linux-aarch64",
+    "pkl-cli-linux-arm64",
     "pkl-cli-linux-x86_64",
 )
 
 register_toolchains(
     "@rules_pkl//pkl:codegen-toolchain",
-    "@rules_pkl//pkl:pkl_toolchain_macos_aarch64",
-    "@rules_pkl//pkl:pkl_toolchain_linux_aarch64",
+    "@rules_pkl//pkl:pkl_toolchain_macos_arm64",
+    "@rules_pkl//pkl:pkl_toolchain_linux_arm64",
     "@rules_pkl//pkl:pkl_toolchain_linux_x86_64",
 )
 

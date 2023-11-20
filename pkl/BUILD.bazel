@@ -9,34 +9,34 @@ toolchain_type(
 )
 
 pkl_toolchain(
-    name = "pkl_macos_aarch64",
+    name = "pkl_macos_arm64",
     cli = "@pkl-cli-macos//file",
     visibility = ["//visibility:public"],
 )
 
 toolchain(
-    name = "pkl_toolchain_macos_aarch64",
+    name = "pkl_toolchain_macos_arm64",
     exec_compatible_with = [
         "@platforms//os:macos",
         "@platforms//cpu:aarch64",
     ],
-    toolchain = ":pkl_macos_aarch64",
+    toolchain = ":pkl_macos_arm64",
     toolchain_type = ":toolchain_type",
 )
 
 pkl_toolchain(
-    name = "pkl_linux_aarch64",
-    cli = "@pkl-cli-linux-aarch64//file",
+    name = "pkl_linux_arm64",
+    cli = "@pkl-cli-linux-arm64//file",
     visibility = ["//visibility:public"],
 )
 
 toolchain(
-    name = "pkl_toolchain_linux_aarch64",
+    name = "pkl_toolchain_linux_arm64",
     exec_compatible_with = [
         "@platforms//os:linux",
         "@platforms//cpu:aarch64",
     ],
-    toolchain = ":pkl_linux_aarch64",
+    toolchain = ":pkl_linux_arm64",
     toolchain_type = ":toolchain_type",
 )
 
