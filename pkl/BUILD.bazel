@@ -8,23 +8,60 @@ toolchain_type(
     name = "toolchain_type",
 )
 
+pkl_toolchain(
+    name = "pkl_macos_aarch64",
+    cli = "@pkl-cli-macos//file",
+    visibility = ["//visibility:public"],
+)
+
+toolchain(
+    name = "pkl_toolchain_macos_aarch64",
+    exec_compatible_with = [
+        "@platforms//os:macos",
+        "@platforms//cpu:aarch64",
+    ],
+    toolchain = ":pkl_macos_aarch64",
+    toolchain_type = ":toolchain_type",
+)
+
+pkl_toolchain(
+    name = "pkl_linux_aarch64",
+    cli = "@pkl-cli-linux-aarch64//file",
+    visibility = ["//visibility:public"],
+)
+
+toolchain(
+    name = "pkl_toolchain_linux_aarch64",
+    exec_compatible_with = [
+        "@platforms//os:linux",
+        "@platforms//cpu:aarch64",
+    ],
+    toolchain = ":pkl_linux_aarch64",
+    toolchain_type = ":toolchain_type",
+)
+
+pkl_toolchain(
+    name = "pkl_linux_x86_64",
+    cli = "@pkl-cli-linux-x86_64//file",
+    visibility = ["//visibility:public"],
+)
+
+toolchain(
+    name = "pkl_toolchain_linux_x86_64",
+    exec_compatible_with = [
+        "@platforms//os:linux",
+        "@platforms//cpu:x86_64",
+    ],
+    toolchain = ":pkl_linux_x86_64",
+    toolchain_type = ":toolchain_type",
+)
+
 toolchain_type(
     name = "codegen_toolchain_type",
 )
 
 toolchain_type(
     name = "doc_toolchain_type",
-)
-
-pkl_toolchain(
-    name = "pkl-toolchain",
-    visibility = ["//visibility:public"],
-)
-
-toolchain(
-    name = "default-toolchain",
-    toolchain = ":pkl-toolchain",
-    toolchain_type = ":toolchain_type",
 )
 
 pkl_codegen_java_toolchain(
@@ -58,16 +95,6 @@ bzl_library(
         "@bazel_tools//tools/build_defs/repo:http.bzl",
         "@bazel_tools//tools/build_defs/repo:utils.bzl",
     ],
-)
-
-alias(
-    name = "pkl_cli",
-    actual = select({
-        "@bazel_tools//src/conditions:darwin_arm64": "@pkl-cli-macos//file",
-        "@bazel_tools//src/conditions:linux_aarch64": "@pkl-cli-linux-aarch64//file",
-        "@bazel_tools//src/conditions:linux_x86_64": "@pkl-cli-linux-x86_64//file",
-    }),
-    visibility = ["//visibility:public"],
 )
 
 java_binary(

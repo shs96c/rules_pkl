@@ -26,8 +26,10 @@ use_repo(
 )
 
 register_toolchains(
-    "@rules_pkl//pkl:default-toolchain",
     "@rules_pkl//pkl:codegen-toolchain",
+    "@rules_pkl//pkl:pkl_toolchain_macos_aarch64",
+    "@rules_pkl//pkl:pkl_toolchain_linux_aarch64",
+    "@rules_pkl//pkl:pkl_toolchain_linux_x86_64",
 )
 
 maven = use_extension("@rules_jvm_external//:extensions.bzl", "maven")

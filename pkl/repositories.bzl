@@ -98,8 +98,10 @@
 
 load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_file")
+load("@rules_jvm_external//:defs.bzl", "maven_install")
+load("//pkl/private:constants.bzl", "PKL_DEPS")
 
-def pkl_cli_binaries():
+def _pkl_cli_binaries():
     maybe(
         http_file,
         name = "pkl-cli-macos",
@@ -122,4 +124,15 @@ def pkl_cli_binaries():
         sha256 = "313465d132b838ca14c2090c5a26a643de899ef831c6155ef03407c450eeda8d",
         name = "pkl-cli-linux-x86_64",
         executable = True,
+    )
+
+def pkl_setup():
+    _pkl_cli_binaries()
+
+    maven_install(
+        name = "rules_pkl_deps",
+        artifacts = PKL_DEPS,
+        repositories = [
+            "https://artifacts.apple.com/libs-release",
+        ],
     )

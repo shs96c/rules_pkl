@@ -15,7 +15,6 @@ pkl_toolchain = rule(
     attrs = {
         "cli": attr.label(
             allow_single_file = True,
-            default = "//pkl:pkl_cli",
             executable = True,
             cfg = "exec",
         ),
