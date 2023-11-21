@@ -1,0 +1,40 @@
+load("//pkl/private:toolchain.bzl", "current_pkl_toolchain")
+
+current_pkl_toolchain(
+    name = "current_toolchain",
+    visibility = ["//visibility:public"],
+)
+
+genrule(
+    name = "test_current_toolchain_at_build_time_bash",
+    srcs = [
+        "test_current_toolchain.sh",
+    ],
+    outs = ["out.txt"],
+    cmd = "bash test/toolchain/test_current_toolchain.sh $(PKL_BIN) > $@",
+    executable = True,
+    toolchains = [
+        ":current_toolchain",
+    ],
+    tools = [
+        ":current_toolchain",
+    ],
+)
+
+sh_test(
+    name = "test_current_toolchain_at_build_time",
+    srcs = ["test_current_toolchain_at_build_time_bash"],
+    toolchains = [
+        ":current_toolchain",
+    ],
+)
+
+sh_test(
+    name = "test_current_toolchain_at_runtime",
+    srcs = ["test_current_toolchain_runtime.sh"],
+    data = [":current_toolchain"],
+    env = {
+        "PKL_BIN": "$(PKL_BIN)",
+    },
+    toolchains = [":current_toolchain"],
+)

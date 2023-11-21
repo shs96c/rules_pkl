@@ -6,6 +6,9 @@ def _pkl_toolchain_impl(ctx):
         symlink_tool = ctx.executable._symlink_tool,
         symlink_default_runfiles = ctx.attr._symlink_tool[DefaultInfo].default_runfiles,
         symlink_files_to_run = ctx.attr._symlink_tool[DefaultInfo].files_to_run,
+        make_variables = platform_common.TemplateVariableInfo({
+            "PKL_BIN": ctx.executable.cli.path,
+        }),
     )
 
     return [toolchain_info]
@@ -59,4 +62,26 @@ pkl_doc_toolchain = rule(
             executable = True,
         ),
     },
+)
+
+def _current_pkl_toolchain_impl(ctx):
+    toolchain = ctx.toolchains[str(Label("//pkl:toolchain_type"))]
+    all_runfiles = ctx.runfiles(files = [toolchain.cli_files_to_run.executable])
+    all_runfiles = all_runfiles.merge(toolchain.cli_default_runfiles)
+    return [
+        toolchain,
+        toolchain.make_variables,
+        DefaultInfo(
+            files = depset(
+                [toolchain.cli],
+            ),
+            runfiles = all_runfiles,
+        ),
+    ]
+
+current_pkl_toolchain = rule(
+    _current_pkl_toolchain_impl,
+    toolchains = [
+        "//pkl:toolchain_type",
+    ],
 )
