@@ -1,5 +1,5 @@
-load("//pkl:defs.bzl", "pkl_library")
 load("@pip//:requirements.bzl", "requirement")
+load("//pkl:defs.bzl", "pkl_library")
 
 pkl_library(
     name = "animals",

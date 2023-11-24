@@ -1,5 +1,5 @@
-load(":pkl.bzl", "pkl_test")
 load("@rules_pkl//pkl/private:pkl_library.bzl", "pkl_library")
+load(":pkl.bzl", "pkl_test")
 
 def pkl_test_suite(
         name,

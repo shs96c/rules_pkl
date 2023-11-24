@@ -1,5 +1,5 @@
-load("//pkl:defs.bzl", "pkl_config_java_library", "pkl_config_src", "pkl_library")
 load("@rules_jvm_external//:defs.bzl", "artifact")
+load("//pkl:defs.bzl", "pkl_config_java_library", "pkl_config_src")
 
 pkl_config_src(
     name = "base",

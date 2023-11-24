@@ -10,19 +10,17 @@ bazel_dep(
     name = "bazel_skylib",
     version = "1.4.2",
 )
-
 bazel_dep(
     name = "rules_jvm_external",
     version = "5.3",
 )
 
 pkl = use_extension("//pkl:extensions.bzl", "pkl")
-
 use_repo(
     pkl,
-    "pkl-cli-macos",
     "pkl-cli-linux-arm64",
     "pkl-cli-linux-x86_64",
+    "pkl-cli-macos",
 )
 
 register_toolchains(
@@ -33,7 +31,6 @@ register_toolchains(
 )
 
 maven = use_extension("@rules_jvm_external//:extensions.bzl", "maven")
-
 maven.install(
     name = "rules_pkl_deps",
     artifacts = [
@@ -49,7 +46,6 @@ maven.install(
         "https://artifacts.apple.com/libs-release",
     ],
 )
-
 use_repo(
     maven,
     "rules_pkl_deps",
@@ -61,13 +57,11 @@ bazel_dep(
     version = "1.4.1",
     dev_dependency = True,
 )
-
 bazel_dep(
     name = "buildifier_prebuilt",
     version = "6.1.0",
     dev_dependency = True,
 )
-
 bazel_dep(
     name = "gazelle",
     version = "0.29.0",
@@ -85,7 +79,6 @@ bazel_dep(
     version = "0.27.0",
     dev_dependency = True,
 )
-
 bazel_dep(
     name = "stardoc",
     version = "0.6.2",
@@ -97,7 +90,6 @@ python = use_extension(
     "python",
     dev_dependency = True,
 )
-
 python.toolchain(
     configure_coverage_tool = True,
     ignore_root_user_error = True,
@@ -109,13 +101,11 @@ pip = use_extension(
     "pip",
     dev_dependency = True,
 )
-
 pip.parse(
     hub_name = "pip",
     python_version = "3.11",
     requirements_lock = "//test:requirements_lock.txt",
 )
-
 use_repo(
     pip,
     "pip",
