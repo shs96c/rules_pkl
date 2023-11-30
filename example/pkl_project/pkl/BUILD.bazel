@@ -1,0 +1,15 @@
+load("@rules_pkl//pkl:defs.bzl", "pkl_run")
+
+pkl_run(
+    name = "example",
+    srcs = [
+        "example.pkl",
+    ],
+    entrypoints = [
+        "example.pkl",
+    ],
+    format = "yaml",
+    deps = [
+        "@mypkl//:packages",
+    ],
+)

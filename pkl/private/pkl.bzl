@@ -15,7 +15,6 @@ def _write_pkl_script(ctx, in_runfiles, command):
     # directory, and if the cache is there then denormalised dependency
     # URIs won't resolve properly.
     working_dir = "%s/work" % ctx.label.name
-    cache_dir = "%s/cache" % ctx.label.name
 
     # A map of {file: path_to_pkl_in_symlinks}
     symlinks = {}
@@ -24,12 +23,15 @@ def _write_pkl_script(ctx, in_runfiles, command):
         symlinks[file] = "%s/%s" % (working_dir, file.short_path)
 
     file_infos = [dep[PklFileInfo] for dep in ctx.attr.srcs + ctx.attr.deps if PklFileInfo in dep]
+    caches = depset(transitive = [i.caches for i in file_infos]).to_list()
+
+    if len(caches) > 1:
+        cache_labels = [c.label for c in caches]
+        fail("Only one cache item is allowed. The following labels of caches were seen: ", cache_labels)
 
     for info in file_infos:
         for file in info.dep_files.to_list():
             symlinks[file] = "%s/%s" % (working_dir, file.short_path)
-        for cache_entry in info.cache_entries.to_list():
-            symlinks[cache_entry.file] = "%s/%s" % (cache_dir, cache_entry.path)
 
     # Mangle symlinks
     path_to_symlink_target = {}
@@ -44,6 +46,10 @@ def _write_pkl_script(ctx, in_runfiles, command):
             # But files that aren't sources will have the correct short_path
             # already, so we can use that.
             path_to_symlink_target[file.short_path] = path
+
+    if len(caches):
+        path_to_symlink_target[caches[0].pkl_project.path] = "%s/PklProject" % working_dir
+        path_to_symlink_target[caches[0].pkl_project_deps.path] = "%s/PklProject.deps.json" % working_dir
 
     symlinks_json_file = ctx.actions.declare_file(ctx.label.name + "_symlinks.json")
     ctx.actions.write(output = symlinks_json_file, content = json.encode(path_to_symlink_target))
@@ -67,7 +73,7 @@ else
     output_args=()
 fi
 
-output=$({executable} {jvm_flags} {command} {format_args} {properties} {expression_args} --working-dir {working_dir} --cache-dir "../cache" "${{output_args[@]}}" {entrypoints})
+output=$({executable} {jvm_flags} {command} {format_args} {properties} {expression_args} --working-dir {working_dir} --cache-dir "{cache_dir}" "${{output_args[@]}}" {entrypoints})
 ret=$?
 if [[ $ret != 0 ]]; then
     echo "Failed processing PKL configuration with entrypoint(s) '{entrypoints}' (PWD: $(pwd)):" >&2
@@ -83,6 +89,7 @@ fi
 exit 1
 """.format(
         bin_dir = ctx.bin_dir.path,
+        cache_dir = caches[0].root.path if len(caches) else ".",
         executable = executable.short_path if in_runfiles else executable.path,
         expression_args = "-x '{}'".format(ctx.attr.expression) if getattr(ctx.attr, "expression") else "",
         format_args = "--format {}".format(ctx.attr.format) if ctx.attr.format else "",
@@ -114,8 +121,12 @@ exit 1
     for dep in ctx.attr.data:
         dep_files.append(dep[DefaultInfo].files)
 
+    direct_files = [script, symlinks_json_file] + symlinks.keys() + [pkl_toolchain.cli]
+    if len(caches):
+        direct_files += [caches[0].root, caches[0].pkl_project, caches[0].pkl_project_deps]
+
     runfiles = ctx.runfiles(
-        files = [script, symlinks_json_file] + symlinks.keys() + [pkl_toolchain.cli],
+        files = direct_files,
         transitive_files = depset(transitive = dep_files + [pkl_toolchain.symlink_default_runfiles.files, pkl_toolchain.cli_default_runfiles.files]),
     )
 

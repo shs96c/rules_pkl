@@ -1,0 +1,8 @@
+amends "pkl:Project"
+
+dependencies {
+  ["io.k8s"] {
+    uri = "package://artifacts.apple.com/pkl/pkl/temp.io.k8s@1.0.0"
+  }
+}
+

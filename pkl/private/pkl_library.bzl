@@ -8,9 +8,9 @@ def _pkl_library_impl(ctx):
         transitive = [dep[PklFileInfo].dep_files for dep in ctx.attr.deps],
     )
 
-    cache_entries = depset(
-        transitive = [dep[PklFileInfo].cache_entries for dep in ctx.attr.deps] +
-                     [src[PklFileInfo].cache_entries for src in ctx.attr.srcs if PklFileInfo in src],
+    caches = depset(
+        transitive = [dep[PklFileInfo].caches for dep in ctx.attr.deps] +
+                     [src[PklFileInfo].caches for src in ctx.attr.srcs if PklFileInfo in src],
     )
 
     return [
@@ -19,7 +19,7 @@ def _pkl_library_impl(ctx):
         ),
         PklFileInfo(
             dep_files = dep_files,
-            cache_entries = cache_entries,
+            caches = caches,
         ),
         OutputGroupInfo(
             pkl_sources = depset(src_files, transitive = [dep_files]),
