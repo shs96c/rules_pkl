@@ -26,6 +26,7 @@ use_repo(
 register_toolchains(
     "@rules_pkl//pkl:codegen-toolchain",
     "@rules_pkl//pkl:pkl_toolchain_macos_arm64",
+    "@rules_pkl//pkl:pkl_toolchain_macos_x86_64",
     "@rules_pkl//pkl:pkl_toolchain_linux_arm64",
     "@rules_pkl//pkl:pkl_toolchain_linux_x86_64",
 )
