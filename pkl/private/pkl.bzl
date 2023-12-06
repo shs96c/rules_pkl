@@ -1,9 +1,6 @@
 load(":providers.bzl", "PklFileInfo")
 
-def _write_pkl_script(ctx, in_runfiles, command):
-    # build executable command
-    jvm_flags = ""
-
+def _prepare_pkl_script(ctx, command):
     pkl_toolchain = ctx.toolchains["//pkl:toolchain_type"]
 
     executable = pkl_toolchain.cli
@@ -55,61 +52,40 @@ def _write_pkl_script(ctx, in_runfiles, command):
     ctx.actions.write(output = symlinks_json_file, content = json.encode(path_to_symlink_target))
     pkl_symlink_tool = pkl_toolchain.symlink_tool
 
-    cmd = """#!/usr/bin/env bash
+    # The 'run_args' and 'test_args' need to be separate to support '--experimental_output_path=strip' until the following
+    # upstream PR is merged (https://github.com/bazelbuild/bazel/pull/16430) as Bazel only performs path stripping on paths in
+    # 'ctx.Args' object, which can't be used in test actions.
+    common_args = [
+        "--format {}".format(ctx.attr.format) if ctx.attr.format else "",
+        " ".join([f.path for f in (ctx.files.entrypoints or ctx.files.srcs)]),
+        "--multiple-file-output-path" if getattr(ctx.attr, "multiple_outputs", False) else "--output-path",
+        working_dir,
+        command,
+    ]
 
-# Create symlinks from the output root to the current folder.
-# This allows Pkl to consume generated files.
+    run_args = common_args + [
+        executable,
+        symlinks_json_file,
+        pkl_symlink_tool,
+    ]
 
-{symlinks_executable} {symlinks_json_file_path}
-ret=$?
-if [[ $ret != 0 ]]; then
-    echo "Failed creating dependency symlinks in Pkl rule setup." >&2
-    exit 1
-fi
+    test_args = common_args + [
+        executable.short_path,
+        symlinks_json_file.short_path,
+        pkl_symlink_tool.short_path,
+    ]
 
-if [[ $# -gt 0 ]]; then
-    output_args=({output_path_flag_name} "$(pwd)/$1")
-else
-    output_args=()
-fi
+    for k, v in ctx.attr.properties.items():
+        property_flag = ["--property", "{}={}".format(k, ctx.expand_location(v, ctx.attr.data))]
+        run_args += property_flag
+        test_args += property_flag
 
-output=$({executable} {jvm_flags} {command} {format_args} {properties} {expression_args} --working-dir {working_dir} --cache-dir "{cache_dir}" "${{output_args[@]}}" {entrypoints})
-ret=$?
-if [[ $ret != 0 ]]; then
-    echo "Failed processing PKL configuration with entrypoint(s) '{entrypoints}' (PWD: $(pwd)):" >&2
-    echo "${{output}}"
-    exit 1
-fi
+    if getattr(ctx.attr, "expression"):
+        expression_flag = ["-x", ctx.attr.expression]
+        run_args += expression_flag
+        test_args += expression_flag
 
-echo "$output" | grep ❌
-ret=$?
-if [[ $ret != 0 ]]; then
-    exit 0
-fi
-exit 1
-""".format(
-        bin_dir = ctx.bin_dir.path,
-        cache_dir = caches[0].root.path if len(caches) else ".",
-        executable = executable.short_path if in_runfiles else executable.path,
-        expression_args = "-x '{}'".format(ctx.attr.expression) if getattr(ctx.attr, "expression") else "",
-        format_args = "--format {}".format(ctx.attr.format) if ctx.attr.format else "",
-        jvm_flags = jvm_flags,
-        properties = " ".join(["--property '{}'='{}'".format(k, ctx.expand_location(v, ctx.attr.data)) for k, v in ctx.attr.properties.items()]),
-        entrypoints = " ".join([f.path for f in (ctx.files.entrypoints or ctx.files.srcs)]),
-        output_path_flag_name = "--multiple-file-output-path" if getattr(ctx.attr, "multiple_outputs", False) else "--output-path",
-        symlinks_json_file_path = symlinks_json_file.short_path if in_runfiles else symlinks_json_file.path,
-        symlinks_executable = pkl_symlink_tool.short_path if in_runfiles else pkl_symlink_tool.path,
-        working_dir = working_dir,
-        command = command,
-    )
-
-    # write shell script
-    script = ctx.actions.declare_file(ctx.label.name + "_run.sh")
-    ctx.actions.write(
-        output = script,
-        content = cmd,
-        is_executable = True,
-    )
+    script = ctx.executable.pkl_script
 
     dep_files = []
     for dep in ctx.attr.deps:
@@ -130,7 +106,7 @@ exit 1
         transitive_files = depset(transitive = dep_files + [pkl_toolchain.symlink_default_runfiles.files, pkl_toolchain.cli_default_runfiles.files]),
     )
 
-    return script, runfiles
+    return script, runfiles, run_args, test_args
 
 _PKL_RUN_ATTRS = {
     "srcs": attr.label_list(
@@ -166,10 +142,15 @@ _PKL_RUN_ATTRS = {
         doc = """Dictionary of name value pairs used to pass in PKL external properties
             See the Pkl docs: https://pages.github.pie.apple.com/pkl/main/current/language-reference/index.html#resources""",
     ),
+    "pkl_script": attr.label(
+        default = "//pkl/private:run_pkl_script",
+        executable = True,
+        cfg = "exec",
+    ),
 }
 
 def _pkl_run_impl(ctx):
-    script, runfiles = _write_pkl_script(ctx, in_runfiles = False, command = "eval")
+    script, runfiles, run_args, _ = _prepare_pkl_script(ctx, command = "eval")
 
     if ctx.attr.out and ctx.attr.multiple_outputs:
         fail("pkl_run: Can't specify both `multiple_outputs` and `out` for target {}".format(ctx.label))
@@ -188,6 +169,13 @@ def _pkl_run_impl(ctx):
 
     pkl_toolchain = ctx.toolchains["//pkl:toolchain_type"]
 
+    is_test = "false"
+    args = ctx.actions.args()
+    args.add_all(
+        [script_output, is_test] + run_args,
+        expand_directories = False,
+    )
+
     result = ctx.actions.run(
         inputs = runfiles.files,
         outputs = outputs,
@@ -196,8 +184,11 @@ def _pkl_run_impl(ctx):
             pkl_toolchain.cli_files_to_run,
             pkl_toolchain.symlink_files_to_run,
         ],
-        arguments = [script_output.path],
+        arguments = [args],
         mnemonic = "PklRun",
+        execution_requirements = {
+            "supports-path-mapping": "1",
+        },
     )
     return [DefaultInfo(files = depset(outputs), runfiles = ctx.runfiles(outputs))]
 
@@ -210,8 +201,31 @@ pkl_run = rule(
 )
 
 def _pkl_test_impl(ctx):
-    script, runfiles = _write_pkl_script(ctx, in_runfiles = True, command = "test")
-    return [DefaultInfo(executable = script, runfiles = runfiles)]
+    script, runfiles, _, test_args = _prepare_pkl_script(ctx, command = "test")
+
+    output_script = ctx.actions.declare_file(ctx.label.name + ".sh")
+
+    is_test = "true"
+    test_args = [output_script.path, is_test] + test_args
+    args_str = " ".join(["'{}'".format(str(a).replace("'", "\\'")) for a in test_args])
+
+    cmd = """#!/usr/bin/env bash
+{script} {args}
+""".format(
+        script = script.short_path,
+        args = args_str,
+    )
+
+    ctx.actions.write(
+        output = output_script,
+        content = cmd,
+        is_executable = True,
+    )
+
+    runfiles = runfiles.merge(ctx.runfiles(files = [script]))
+    output_script = ctx.actions.declare_file(ctx.label.name + ".sh")
+
+    return [DefaultInfo(executable = output_script, runfiles = runfiles)]
 
 pkl_test = rule(
     implementation = _pkl_test_impl,

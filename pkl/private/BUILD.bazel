@@ -8,3 +8,9 @@ bzl_library(
         "@rules_jvm_external//:implementation",
     ],
 )
+
+sh_binary(
+    name = "run_pkl_script",
+    srcs = ["run_pkl_script.sh"],
+    visibility = ["//visibility:public"],
+)
