@@ -1,5 +1,5 @@
 PklFileInfo = provider(
-    doc = "A combination of base Pkl files (from `pkl_library`) and cache entries, required to evaluate `pkl_run` rules",
+    doc = "A combination of base Pkl files (from `pkl_library`) and cache entries, required to evaluate `pkl_eval` rules",
     fields = {
         "dep_files": "Depset of the transitive closure of Pkl files and their dependencies",
         "caches": "Depset of `PklCacheInfo`. When executing Pkl commands, there must be at most one item in this depset",

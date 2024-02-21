@@ -1,4 +1,4 @@
-load("//pkl:defs.bzl", "pkl_run", "pkl_test", "pkl_test_suite")
+load("//pkl:defs.bzl", "pkl_eval", "pkl_test", "pkl_test_suite")
 
 pkl_test(
     name = "pkl_test_1",
@@ -6,8 +6,8 @@ pkl_test(
     data = ["srcs/cat.pkl"],
 )
 
-pkl_run(
-    name = "pkl_run_1",
+pkl_eval(
+    name = "pkl_eval_1",
     srcs = ["srcs/test_1.pkl"],
     data = ["srcs/cat.pkl"],
 )

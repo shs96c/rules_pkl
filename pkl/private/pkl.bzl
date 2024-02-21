@@ -108,7 +108,7 @@ def _prepare_pkl_script(ctx, command):
 
     return script, runfiles, run_args, test_args
 
-_PKL_RUN_ATTRS = {
+_PKL_EVAL_ATTRS = {
     "srcs": attr.label_list(
         allow_files = [".pkl"],
     ),
@@ -149,11 +149,11 @@ _PKL_RUN_ATTRS = {
     ),
 }
 
-def _pkl_run_impl(ctx):
+def _pkl_eval_impl(ctx):
     script, runfiles, run_args, _ = _prepare_pkl_script(ctx, command = "eval")
 
     if ctx.attr.out and ctx.attr.multiple_outputs:
-        fail("pkl_run: Can't specify both `multiple_outputs` and `out` for target {}".format(ctx.label))
+        fail("pkl_eval: Can't specify both `multiple_outputs` and `out` for target {}".format(ctx.label))
 
     output_format = ctx.attr.format or "pcf"
     if ctx.attr.out == None:
@@ -192,9 +192,9 @@ def _pkl_run_impl(ctx):
     )
     return [DefaultInfo(files = depset(outputs), runfiles = ctx.runfiles(outputs))]
 
-pkl_run = rule(
-    _pkl_run_impl,
-    attrs = _PKL_RUN_ATTRS,
+pkl_eval = rule(
+    _pkl_eval_impl,
+    attrs = _PKL_EVAL_ATTRS,
     toolchains = [
         "//pkl:toolchain_type",
     ],
@@ -229,7 +229,7 @@ def _pkl_test_impl(ctx):
 
 pkl_test = rule(
     implementation = _pkl_test_impl,
-    attrs = _PKL_RUN_ATTRS,
+    attrs = _PKL_EVAL_ATTRS,
     test = True,
     toolchains = [
         "//pkl:toolchain_type",
