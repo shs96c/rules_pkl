@@ -2,6 +2,7 @@
 # Create symlinks from the output root to the current folder.
 # This allows Pkl to consume generated files.
 
+expected_output=$1
 is_test=$2
 format_args=$3
 entrypoints=$4
@@ -11,7 +12,6 @@ command=$7
 executable=$8
 symlinks_json_file_path=$9
 symlinks_executable=${10}
-
 
 properties_and_expressions=()
 num_args=$#
@@ -33,7 +33,7 @@ if [ "$is_test" == "false" ]; then
 else
     output_args=()
 fi
-output=$($executable "$command" $format_args "${properties_and_expressions[@]}" $expression_args  --cache-dir "../cache" "${output_args[@]}" $entrypoints)
+output=$($executable "$command" $format_args "${properties_and_expressions[@]}" $expression_args --working-dir "${working_dir}" --cache-dir "../cache" "${output_args[@]}" $entrypoints)
 
 ret=$?
 if [[ $ret != 0 ]]; then
@@ -41,6 +41,9 @@ if [[ $ret != 0 ]]; then
     echo "${output}"
     exit 1
 fi
+
+# Move the output from the working dir to where Bazel expects it
+mv "${working_dir}/${expected_output}" "$1"
 
 echo "$output" | grep ❌
 ret=$?

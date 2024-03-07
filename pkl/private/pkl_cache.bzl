@@ -28,7 +28,7 @@ pkl_cached_package = rule(
 )
 
 def _pkl_cache_impl(ctx):
-    output_dir = ctx.actions.declare_file(ctx.label.name)
+    output_dir = ctx.actions.declare_directory(ctx.label.name)
 
     inputs = []
     args = ctx.actions.args()

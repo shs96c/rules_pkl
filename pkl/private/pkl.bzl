@@ -47,6 +47,7 @@ def _prepare_pkl_script(ctx, command):
     if len(caches):
         path_to_symlink_target[caches[0].pkl_project.path] = "%s/PklProject" % working_dir
         path_to_symlink_target[caches[0].pkl_project_deps.path] = "%s/PklProject.deps.json" % working_dir
+        path_to_symlink_target[caches[0].root.path] = "%s/cache" % ctx.label.name
 
     symlinks_json_file = ctx.actions.declare_file(ctx.label.name + "_symlinks.json")
     ctx.actions.write(output = symlinks_json_file, content = json.encode(path_to_symlink_target))
@@ -85,7 +86,7 @@ def _prepare_pkl_script(ctx, command):
         run_args += expression_flag
         test_args += expression_flag
 
-    script = ctx.executable.pkl_script
+    script = ctx.executable._pkl_script
 
     dep_files = []
     for dep in ctx.attr.deps:
@@ -142,7 +143,7 @@ _PKL_EVAL_ATTRS = {
         doc = """Dictionary of name value pairs used to pass in PKL external properties
             See the Pkl docs: https://pages.github.pie.apple.com/pkl/main/current/language-reference/index.html#resources""",
     ),
-    "pkl_script": attr.label(
+    "_pkl_script": attr.label(
         default = "//pkl/private:run_pkl_script",
         executable = True,
         cfg = "exec",
