@@ -1,11 +1,7 @@
 def _pkl_toolchain_impl(ctx):
     toolchain_info = platform_common.ToolchainInfo(
-        cli = ctx.executable.cli,
-        cli_files_to_run = ctx.attr.cli[DefaultInfo].files_to_run,
-        cli_default_runfiles = ctx.attr.cli[DefaultInfo].default_runfiles,
-        symlink_tool = ctx.executable._symlink_tool,
-        symlink_default_runfiles = ctx.attr._symlink_tool[DefaultInfo].default_runfiles,
-        symlink_files_to_run = ctx.attr._symlink_tool[DefaultInfo].files_to_run,
+        cli = ctx.attr.cli,
+        symlink_tool = ctx.attr._symlink_tool,
         make_variables = platform_common.TemplateVariableInfo({
             "PKL_BIN": ctx.executable.cli.path,
         }),
@@ -17,7 +13,6 @@ pkl_toolchain = rule(
     _pkl_toolchain_impl,
     attrs = {
         "cli": attr.label(
-            allow_single_file = True,
             executable = True,
             cfg = "exec",
         ),
@@ -66,14 +61,14 @@ pkl_doc_toolchain = rule(
 
 def _current_pkl_toolchain_impl(ctx):
     toolchain = ctx.toolchains[str(Label("//pkl:toolchain_type"))]
-    all_runfiles = ctx.runfiles(files = [toolchain.cli_files_to_run.executable])
-    all_runfiles = all_runfiles.merge(toolchain.cli_default_runfiles)
+    all_runfiles = ctx.runfiles(files = [toolchain.cli[DefaultInfo].files_to_run.executable])
+    all_runfiles = all_runfiles.merge(toolchain.cli[DefaultInfo].default_runfiles)
     return [
         toolchain,
         toolchain.make_variables,
         DefaultInfo(
             files = depset(
-                [toolchain.cli],
+                transitive = [toolchain.cli[DefaultInfo].files],
             ),
             runfiles = all_runfiles,
         ),

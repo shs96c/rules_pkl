@@ -1,9 +1,21 @@
 load(":providers.bzl", "PklFileInfo")
 
+def _best_path(file):
+    if file.is_source:
+        # Files from the cache hit this code path. For them, the `path`
+        # points to the path from the root of the repo (valid from where
+        # we run the scripts), but `short_path` starts with `../` and so
+        # points to nowhere when we finally merge things
+        return file.path
+    else:
+        # But files that aren't sources will have the correct short_path
+        # already, so we can use that.
+        return file.short_path
+
 def _prepare_pkl_script(ctx, command):
     pkl_toolchain = ctx.toolchains["//pkl:toolchain_type"]
 
-    executable = pkl_toolchain.cli
+    executable = pkl_toolchain.cli[DefaultInfo].files_to_run.executable
 
     # Build a forest of symlinks. Why do we need to this? It's because
     # when we execute the Pkl, the cache directory cannot be below the
@@ -33,6 +45,7 @@ def _prepare_pkl_script(ctx, command):
     # Mangle symlinks
     path_to_symlink_target = {}
     for file, path in symlinks.items():
+        path_to_symlink_target[_best_path(file)] = path
         if file.is_source:
             # Files from the cache hit this code path. For them, the `path`
             # points to the path from the root of the repo (valid from where
@@ -67,13 +80,13 @@ def _prepare_pkl_script(ctx, command):
     run_args = common_args + [
         executable,
         symlinks_json_file,
-        pkl_symlink_tool,
+        pkl_symlink_tool[DefaultInfo].files_to_run.executable.path,
     ]
 
     test_args = common_args + [
         executable.short_path,
         symlinks_json_file.short_path,
-        pkl_symlink_tool.short_path,
+        pkl_symlink_tool[DefaultInfo].files_to_run.executable.short_path,
     ]
 
     for k, v in ctx.attr.properties.items():
@@ -88,7 +101,10 @@ def _prepare_pkl_script(ctx, command):
 
     script = ctx.executable._pkl_script
 
-    dep_files = []
+    dep_files = [
+        pkl_toolchain.cli[DefaultInfo].files,
+        pkl_toolchain.symlink_tool[DefaultInfo].files,
+    ]
     for dep in ctx.attr.deps:
         dep_files += [dep.files, dep[PklFileInfo].dep_files]
 
@@ -98,15 +114,23 @@ def _prepare_pkl_script(ctx, command):
     for dep in ctx.attr.data:
         dep_files.append(dep[DefaultInfo].files)
 
-    direct_files = [script, symlinks_json_file] + symlinks.keys() + [pkl_toolchain.cli]
+    direct_files = [script, symlinks_json_file] + symlinks.keys()
     if len(caches):
         direct_files += [caches[0].root, caches[0].pkl_project, caches[0].pkl_project_deps]
 
     runfiles = ctx.runfiles(
-        files = direct_files,
-        transitive_files = depset(transitive = dep_files + [pkl_toolchain.symlink_default_runfiles.files, pkl_toolchain.cli_default_runfiles.files]),
+        files = direct_files + [
+            pkl_toolchain.cli[DefaultInfo].files_to_run.executable,
+            pkl_toolchain.symlink_tool[DefaultInfo].files_to_run.executable,
+        ],
+        transitive_files = depset(
+            transitive = [pkl_toolchain.cli[DefaultInfo].files, pkl_toolchain.symlink_tool[DefaultInfo].files] + dep_files,
+        ),
+    ).merge(
+        pkl_toolchain.symlink_tool[DefaultInfo].default_runfiles,
+    ).merge(
+        pkl_toolchain.cli[DefaultInfo].default_runfiles,
     )
-
     return script, runfiles, run_args, test_args
 
 _PKL_EVAL_ATTRS = {
@@ -182,8 +206,8 @@ def _pkl_eval_impl(ctx):
         outputs = outputs,
         executable = script,
         tools = [
-            pkl_toolchain.cli_files_to_run,
-            pkl_toolchain.symlink_files_to_run,
+            pkl_toolchain.cli[DefaultInfo].files_to_run,
+            pkl_toolchain.symlink_tool[DefaultInfo].files_to_run,
         ],
         arguments = [args],
         mnemonic = "PklRun",
