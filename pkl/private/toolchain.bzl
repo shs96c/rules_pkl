@@ -1,13 +1,28 @@
 def _pkl_toolchain_impl(ctx):
-    toolchain_info = platform_common.ToolchainInfo(
-        cli = ctx.attr.cli,
-        symlink_tool = ctx.attr._symlink_tool,
-        make_variables = platform_common.TemplateVariableInfo({
-            "PKL_BIN": ctx.executable.cli.path,
-        }),
+    all_runfiles = ctx.runfiles(files = [ctx.attr.cli[DefaultInfo].files_to_run.executable])
+    all_runfiles = all_runfiles.merge(ctx.attr.cli[DefaultInfo].default_runfiles)
+    default_info = DefaultInfo(
+        files = depset(
+            transitive = [ctx.attr.cli[DefaultInfo].files],
+        ),
+        runfiles = all_runfiles,
     )
 
-    return [toolchain_info]
+    make_variables = platform_common.TemplateVariableInfo({
+        "PKL_BIN": ctx.executable.cli.path,
+    })
+    toolchain_info = platform_common.ToolchainInfo(
+        cli = ctx.attr.cli,
+        default_info = default_info,
+        make_variables = make_variables,
+        symlink_tool = ctx.attr._symlink_tool,
+    )
+
+    return [
+        default_info,
+        make_variables,
+        toolchain_info,
+    ]
 
 pkl_toolchain = rule(
     _pkl_toolchain_impl,
