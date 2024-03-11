@@ -13,6 +13,9 @@ pipelines {
             steps {
                 // language=bash
                 """
+                # bazelrc declares a cc toolchain that depends on the Federation but that this project can't depend
+                # on the federation, so removing the bazelrc.
+                rm /etc/bazel.bazelrc
                 bazel --nosystem_rc --server_javabase=/applejdk test ... --announce_rc
                 """
             }
