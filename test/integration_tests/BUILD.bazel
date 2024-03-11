@@ -1,0 +1,30 @@
+load("@bazel_binaries//:defs.bzl", "bazel_binaries")
+load(
+    "@rules_bazel_integration_test//bazel_integration_test:defs.bzl",
+    "bazel_integration_test",
+    "default_test_runner",
+    "integration_test_utils",
+)
+
+default_test_runner(
+    name = "simple_test_runner",
+)
+
+bazel_integration_test(
+    name = "pkl_deps_test",
+    bazel_version = bazel_binaries.versions.current,
+    test_runner = ":simple_test_runner",
+    workspace_files = integration_test_utils.glob_workspace_files("example_workspaces/simple") + [
+        "//:workspace_files",
+    ],
+    workspace_path = "example_workspaces/simple",
+)
+
+# By default, the integration test targets are tagged as `manual`, so we need
+# define a `test_suite` target for the integration test to be executed during
+# bazel test //...
+test_suite(
+    name = "all_integration_tests",
+    tests = [":pkl_deps_test"],
+    visibility = ["//:__subpackages__"],
+)

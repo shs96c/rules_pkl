@@ -1,0 +1,16 @@
+bazel_dep(name = "rules_pkl", version = "1.0")
+local_path_override(
+    module_name = "rules_pkl",
+    path = "../../../..",
+)
+
+pkl = use_extension("@rules_pkl//pkl:extensions.bzl", "pkl")
+pkl.project(
+    name = "mypkl",
+    pkl_project = "@//:PklProject",
+    pkl_project_deps = "@//:PklProject.deps.json",
+)
+use_repo(
+    pkl,
+    "mypkl",
+)

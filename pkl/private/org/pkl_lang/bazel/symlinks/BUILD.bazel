@@ -1,5 +1,14 @@
 load("@rules_jvm_external//:defs.bzl", "artifact")
 
+filegroup(
+    name = "all_files",
+    srcs = glob(["*"]),
+    visibility = [
+        "//:__pkg__",
+        "//test/integration_tests:__subpackages__",
+    ],
+)
+
 java_binary(
     name = "symlinks",
     srcs = ["Symlinks.java"],

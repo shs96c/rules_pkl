@@ -9,3 +9,16 @@ gazelle(
     name = "gazelle",
     gazelle = "gazelle_bin",
 )
+
+filegroup(
+    name = "workspace_files",
+    srcs = [
+        "BUILD.bazel",
+        "MODULE.bazel",
+        "WORKSPACE",
+        "//pkl:all_files",
+        "//pkl/private:all_files",
+        "//pkl/private/org/pkl_lang/bazel/symlinks:all_files",
+    ],
+    visibility = ["//test/integration_tests:__subpackages__"],
+)

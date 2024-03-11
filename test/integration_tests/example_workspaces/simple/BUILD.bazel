@@ -1,0 +1,24 @@
+load("@rules_pkl//pkl:defs.bzl", "pkl_eval")
+
+pkl_eval(
+    name = "example",
+    srcs = [
+        "example.pkl",
+    ],
+    entrypoints = [
+        "example.pkl",
+    ],
+    format = "yaml",
+    deps = [
+        "@mypkl//:packages",
+    ],
+)
+
+sh_test(
+    name = "verify",
+    srcs = ["verify_generated_yaml.sh"],
+    data = [
+        ":example",
+        ":expected_output.yaml",
+    ],
+)
