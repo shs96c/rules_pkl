@@ -17,3 +17,4 @@
 bazel-*
 /example/*/bazel-*
 /tests/*/bazel-*
+MODULE.bazel.lock
