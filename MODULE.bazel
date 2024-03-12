@@ -18,6 +18,7 @@ bazel_dep(
 pkl = use_extension("//pkl:extensions.bzl", "pkl")
 use_repo(
     pkl,
+    "pkl-cli-java",
     "pkl-cli-linux-arm64",
     "pkl-cli-linux-x86_64",
     "pkl-cli-macos",
@@ -25,6 +26,7 @@ use_repo(
 
 register_toolchains(
     "@rules_pkl//pkl:codegen-toolchain",
+    "@rules_pkl//pkl:pkl_toolchain_java",
     "@rules_pkl//pkl:pkl_toolchain_macos_arm64",
     "@rules_pkl//pkl:pkl_toolchain_macos_x86_64",
     "@rules_pkl//pkl:pkl_toolchain_linux_arm64",

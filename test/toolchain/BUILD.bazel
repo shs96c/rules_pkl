@@ -38,3 +38,13 @@ sh_test(
     },
     toolchains = [":current_toolchain"],
 )
+
+sh_test(
+    name = "test_current_toolchain_at_runtime_pkl_java",
+    srcs = ["test_current_toolchain_runtime.sh"],
+    data = ["//pkl:pkl_java"],
+    env = {
+        "PKL_BIN": "$(PKL_BIN)",
+    },
+    toolchains = ["//pkl:pkl_java"],
+)

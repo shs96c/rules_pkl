@@ -81,6 +81,18 @@ toolchain(
     toolchain_type = ":toolchain_type",
 )
 
+pkl_toolchain(
+    name = "pkl_java",
+    cli = "@pkl-cli-java//file",
+    visibility = ["//visibility:public"],
+)
+
+toolchain(
+    name = "pkl_toolchain_java",
+    toolchain = ":pkl_java",
+    toolchain_type = ":toolchain_type",
+)
+
 toolchain_type(
     name = "codegen_toolchain_type",
 )
