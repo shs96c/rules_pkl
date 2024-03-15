@@ -6,7 +6,7 @@ expected_output=$1
 is_test=$2
 format_args=$3
 entrypoints=$4
-output_path_flag_name=$5
+multiple_outputs=$5
 working_dir=$6
 command=$7
 executable=$8
@@ -29,10 +29,16 @@ if [[ $ret != 0 ]]; then
 fi
 
 if [ "$is_test" == "false" ]; then
-    output_args=($output_path_flag_name "$1")
+  if [ "$multiple_outputs" == "true" ]; then
+    mkdir _generated_files
+    output_args=( "--multiple-file-output-path" "_generated_files")
+  else
+    output_args=("--output-path" "$expected_output")
+  fi
 else
     output_args=()
 fi
+
 output=$($executable "$command" $format_args "${properties_and_expressions[@]}" $expression_args --working-dir "${working_dir}" --cache-dir "../cache" "${output_args[@]}" $entrypoints)
 
 ret=$?
@@ -42,8 +48,18 @@ if [[ $ret != 0 ]]; then
     exit 1
 fi
 
+
+if [[ "$command" == eval ]]; then
 # Move the output from the working dir to where Bazel expects it
-mv "${working_dir}/${expected_output}" "$1"
+  if [ "$multiple_outputs" == true ]; then
+       mv "${working_dir}/_generated_files"/* "$expected_output"
+
+  else
+     mv "${working_dir}/${expected_output}" "$expected_output"
+  fi
+fi
+
+
 
 echo "$output" | grep ❌
 ret=$?

@@ -1,0 +1,22 @@
+transit {
+  Make = "Ford"
+  Model = "Transit"
+}
+
+panda {
+  Make = "Fiat"
+  Model = "Panda"
+}
+
+output {
+  files {
+    ["vans/ford.json"] {
+      value = transit
+      renderer = new JsonRenderer {}
+    }
+    ["cars/fiat.yaml"] {
+      value = panda
+      renderer = new YamlRenderer {}
+    }
+  }
+}

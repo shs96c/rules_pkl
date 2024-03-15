@@ -72,7 +72,7 @@ def _prepare_pkl_script(ctx, command):
     common_args = [
         "--format {}".format(ctx.attr.format) if ctx.attr.format else "",
         " ".join([f.path for f in (ctx.files.entrypoints or ctx.files.srcs)]),
-        "--multiple-file-output-path" if getattr(ctx.attr, "multiple_outputs", False) else "--output-path",
+        ctx.attr.multiple_outputs,
         working_dir,
         command,
     ]
@@ -158,10 +158,12 @@ _PKL_EVAL_ATTRS = {
         doc = "The format of the generated file to pass when calling `pkl`. See https://pages.github.pie.apple.com/pkl/main/current/pkl-cli/index.html#options.",
     ),
     "multiple_outputs": attr.bool(
-        doc = "Whether to expect to render multiple file outputs to a single directory with the name of the target (see https://pkl.apple.com/main/current/language-reference/index.html#multiple-file-output). This flag is mutually exclusive with the `out` attribute.",
+        doc = """Whether to expect to render multiple file outputs. If `outs` is specified then individual generated files will
+        be exposed. Otherwise, a single directory, with the name of the target, containing all generated files will be exposed.
+        (see https://pkl.apple.com/main/current/language-reference/index.html#multiple-file-output).""",
     ),
-    "out": attr.output(
-        doc = "Name of the output file to generate. Defaults to `<rule name>.<format>`. If the format attribute is unset, use `<rule name>.pcf`. This flag is mutually exclusive with the `multiple_outputs` attribute.",
+    "outs": attr.string_list(
+        doc = "Name of the output file to generate. Defaults to `<rule name>.<format>`. If the format attribute is unset, use `<rule name>.pcf`. Expects a single file if `multiple_outputs` is not set to `True`.",
     ),
     "properties": attr.string_dict(
         doc = """Dictionary of name value pairs used to pass in PKL external properties
@@ -176,28 +178,40 @@ _PKL_EVAL_ATTRS = {
 
 def _pkl_eval_impl(ctx):
     script, runfiles, run_args, _ = _prepare_pkl_script(ctx, command = "eval")
+    if not ctx.attr.multiple_outputs and len(ctx.attr.outs) > 1:
+        fail("expecting single output file, however {outputs_count} outputs have been specified. Set `multiple_outputs=True` if expecting multiple outputs."
+            .format(outputs_count = len(ctx.attr.outs)))
 
-    if ctx.attr.out and ctx.attr.multiple_outputs:
-        fail("pkl_eval: Can't specify both `multiple_outputs` and `out` for target {}".format(ctx.label))
+    outputs = []
+    output_location = ""
 
-    output_format = ctx.attr.format or "pcf"
-    if ctx.attr.out == None:
-        if ctx.attr.multiple_outputs:
-            script_output = ctx.actions.declare_directory(ctx.attr.name)
+    # if `multiple_outputs`== true && `outs` is specified, then individual generated files listed in `outs` are created.
+    # if `multiple_outputs`== true && `outs` is NOT specified, then a single directory of generated files is created.
+    # if `multiple_outputs`== false && `outs` is specified, then the single file listed in `outs` is created.
+    # if `multiple_outputs`== true && `outs` is NOT specified, then a file named with the target's label is created.
+
+    if ctx.attr.multiple_outputs:
+        if len(ctx.attr.outs) > 0:
+            for output_name in ctx.attr.outs:
+                relative_path = "{}/{}".format(ctx.label.name, output_name)
+                outputs.append(ctx.actions.declare_file(relative_path))
+            output_location = outputs[0].path.removesuffix(ctx.attr.outs[0])
         else:
-            script_output_name = ctx.attr.name + "." + output_format
-            script_output = ctx.actions.declare_file(script_output_name)
+            output_location = ctx.actions.declare_directory(ctx.label.name)
+            outputs.append(output_location)
     else:
-        script_output = ctx.outputs.out
-
-    outputs = [script_output]
+        output_format = ctx.attr.format or "pcf"
+        filename = ctx.attr.outs[0] if len(ctx.attr.outs) > 0 else "{}.{}".format(ctx.label.name, output_format)
+        relative_path = "{}/{}".format(ctx.label.name, filename)
+        output_location = ctx.actions.declare_file(relative_path)
+        outputs.append(output_location)
 
     pkl_toolchain = ctx.toolchains["//pkl:toolchain_type"]
 
     is_test = "false"
     args = ctx.actions.args()
     args.add_all(
-        [script_output, is_test] + run_args,
+        [output_location, is_test] + run_args,
         expand_directories = False,
     )
 

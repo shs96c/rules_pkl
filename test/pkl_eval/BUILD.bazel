@@ -1,0 +1,76 @@
+load("//pkl:defs.bzl", "pkl_eval")
+
+pkl_eval(
+    name = "pkl_eval_without_out",
+    srcs = ["srcs/simple.pkl"],
+)
+
+pkl_eval(
+    name = "pkl_eval_with_out",
+    srcs = ["srcs/simple.pkl"],
+    outs = ["helloworld.pcf"],
+)
+
+pkl_eval(
+    name = "pkl_eval_multiple_with_outs",
+    srcs = [
+        "srcs/multiple_outputs.pkl",
+    ],
+    outs = [
+        "cars/fiat.yaml",
+        "vans/ford.json",
+    ],
+    multiple_outputs = True,
+)
+
+pkl_eval(
+    name = "pkl_eval_multiple_without_outs",
+    srcs = [
+        "srcs/multiple_outputs.pkl",
+    ],
+    multiple_outputs = True,
+)
+
+sh_test(
+    name = "test_pkl_eval_multiple_with_outputs",
+    srcs = ["verify_pkl_eval_output.sh"],
+    args = [
+        "multiple_outputs_specified",
+    ],
+    data = [
+        "expected/multiple_outputs_specified.txt",
+        ":pkl_eval_multiple_with_outs",
+    ],
+)
+
+sh_test(
+    name = "test_pkl_eval_multiple_without_outputs",
+    srcs = ["verify_pkl_eval_output.sh"],
+    args = [
+        "multiple_outputs_not_specified",
+    ],
+    data = [
+        "expected/multiple_outputs_not_specified.txt",
+        ":pkl_eval_multiple_without_outs",
+    ],
+)
+
+sh_test(
+    name = "test_pkl_eval_with_outs",
+    srcs = ["verify_pkl_eval_output.sh"],
+    args = ["single_output_specified"],
+    data = [
+        "expected/single_output_specified.txt",
+        ":pkl_eval_with_out",
+    ],
+)
+
+sh_test(
+    name = "test_pkl_eval_without_outs",
+    srcs = ["verify_pkl_eval_output.sh"],
+    args = ["single_output_not_specified"],
+    data = [
+        "expected/single_output_not_specified.txt",
+        ":pkl_eval_without_out",
+    ],
+)
