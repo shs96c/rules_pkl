@@ -43,9 +43,14 @@ output=$($executable "$command" $format_args "${properties_and_expressions[@]}" 
 
 ret=$?
 if [[ $ret != 0 ]]; then
+  if [ "$command" == eval ]; then
     echo "Failed processing PKL configuration with entrypoint(s) '$entrypoints' (PWD: $(pwd)):" >&2
     echo "${output}"
-    exit 1
+  else
+    echo "Test failed."
+    echo "${output}"
+  fi
+  exit 1
 fi
 
 
@@ -58,12 +63,3 @@ if [[ "$command" == eval ]]; then
      mv "${working_dir}/${expected_output}" "$expected_output"
   fi
 fi
-
-
-
-echo "$output" | grep ❌
-ret=$?
-if [[ $ret != 0 ]]; then
-    exit 0
-fi
-exit 1
