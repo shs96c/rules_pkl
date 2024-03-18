@@ -12,7 +12,7 @@ def _best_path(file):
         # already, so we can use that.
         return file.short_path
 
-def _prepare_pkl_script(ctx, command):
+def _prepare_pkl_script(ctx):
     pkl_toolchain = ctx.toolchains["//pkl:toolchain_type"]
 
     executable = pkl_toolchain.cli[DefaultInfo].files_to_run.executable
@@ -74,7 +74,6 @@ def _prepare_pkl_script(ctx, command):
         " ".join([f.path for f in (ctx.files.entrypoints or ctx.files.srcs)]),
         ctx.attr.multiple_outputs,
         working_dir,
-        command,
     ]
 
     run_args = common_args + [
@@ -177,7 +176,8 @@ _PKL_EVAL_ATTRS = {
 }
 
 def _pkl_eval_impl(ctx):
-    script, runfiles, run_args, _ = _prepare_pkl_script(ctx, command = "eval")
+    script, runfiles, run_args, _ = _prepare_pkl_script(ctx)
+
     if not ctx.attr.multiple_outputs and len(ctx.attr.outs) > 1:
         fail("expecting single output file, however {outputs_count} outputs have been specified. Set `multiple_outputs=True` if expecting multiple outputs."
             .format(outputs_count = len(ctx.attr.outs)))
@@ -208,10 +208,10 @@ def _pkl_eval_impl(ctx):
 
     pkl_toolchain = ctx.toolchains["//pkl:toolchain_type"]
 
-    is_test = "false"
+    pkl_command = "eval"
     args = ctx.actions.args()
     args.add_all(
-        [output_location, is_test] + run_args,
+        [output_location, pkl_command] + run_args,
         expand_directories = False,
     )
 
@@ -240,12 +240,13 @@ pkl_eval = rule(
 )
 
 def _pkl_test_impl(ctx):
-    script, runfiles, _, test_args = _prepare_pkl_script(ctx, command = "test")
+    script, runfiles, _, test_args = _prepare_pkl_script(ctx)
 
     output_script = ctx.actions.declare_file(ctx.label.name + ".sh")
 
-    is_test = "true"
-    test_args = [output_script.path, is_test] + test_args
+    pkl_command = "test"
+
+    test_args = [output_script.path, pkl_command] + test_args
     args_str = " ".join(["'{}'".format(str(a).replace("'", "\\'")) for a in test_args])
 
     cmd = """#!/usr/bin/env bash

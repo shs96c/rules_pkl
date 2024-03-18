@@ -3,22 +3,17 @@
 # This allows Pkl to consume generated files.
 
 expected_output=$1
-is_test=$2
+command=$2
 format_args=$3
 entrypoints=$4
 multiple_outputs=$5
 working_dir=$6
-command=$7
-executable=$8
-symlinks_json_file_path=$9
-symlinks_executable=${10}
+executable=$7
+symlinks_json_file_path=$8
+symlinks_executable=$9
 
-properties_and_expressions=()
-num_args=$#
-for ((j=11;j<=num_args;j++)); do
-    val=${!j}
-    properties_and_expressions+=("$val")
-done
+shift 9
+properties_and_expressions=("$@")
 
 "$symlinks_executable" "$symlinks_json_file_path"
 
@@ -28,15 +23,18 @@ if [[ $ret != 0 ]]; then
     exit 1
 fi
 
-if [ "$is_test" == "false" ]; then
+if [ "$command" == "eval" ]; then
   if [ "$multiple_outputs" == "true" ]; then
     mkdir _generated_files
     output_args=( "--multiple-file-output-path" "_generated_files")
   else
     output_args=("--output-path" "$expected_output")
   fi
-else
+elif [[ "$command" == "test" ]]; then
     output_args=()
+else
+  echo "invalid command: $command" >&2
+  exit 1
 fi
 
 output=$($executable "$command" $format_args "${properties_and_expressions[@]}" $expression_args --working-dir "${working_dir}" --cache-dir "../cache" "${output_args[@]}" $entrypoints)
