@@ -18,7 +18,7 @@ pkl_codegen_java_toolchain(<a href="#pkl_codegen_java_toolchain-name">name</a>, 
 | Name  | Description | Type | Mandatory | Default |
 | :------------- | :------------- | :------------- | :------------- | :------------- |
 | <a id="pkl_codegen_java_toolchain-name"></a>name |  A unique name for this target.   | <a href="https://bazel.build/concepts/labels#target-names">Name</a> | required |  |
-| <a id="pkl_codegen_java_toolchain-cli"></a>cli |  -   | <a href="https://bazel.build/concepts/labels">Label</a> | optional |  `//pkl:pkl_codegen_cli`  |
+| <a id="pkl_codegen_java_toolchain-cli"></a>cli |  -   | <a href="https://bazel.build/concepts/labels">Label</a> | optional |  `"@rules_pkl//pkl:pkl_codegen_cli"`  |
 
 
 <a id="pkl_doc_toolchain"></a>
@@ -37,7 +37,35 @@ pkl_doc_toolchain(<a href="#pkl_doc_toolchain-name">name</a>, <a href="#pkl_doc_
 | Name  | Description | Type | Mandatory | Default |
 | :------------- | :------------- | :------------- | :------------- | :------------- |
 | <a id="pkl_doc_toolchain-name"></a>name |  A unique name for this target.   | <a href="https://bazel.build/concepts/labels#target-names">Name</a> | required |  |
-| <a id="pkl_doc_toolchain-cli"></a>cli |  -   | <a href="https://bazel.build/concepts/labels">Label</a> | optional |  `//pkl:pkl_doc_cli`  |
+| <a id="pkl_doc_toolchain-cli"></a>cli |  -   | <a href="https://bazel.build/concepts/labels">Label</a> | optional |  `"@rules_pkl//pkl:pkl_doc_cli"`  |
+
+
+<a id="pkl_eval"></a>
+
+## pkl_eval
+
+<pre>
+pkl_eval(<a href="#pkl_eval-name">name</a>, <a href="#pkl_eval-deps">deps</a>, <a href="#pkl_eval-srcs">srcs</a>, <a href="#pkl_eval-data">data</a>, <a href="#pkl_eval-outs">outs</a>, <a href="#pkl_eval-entrypoints">entrypoints</a>, <a href="#pkl_eval-expression">expression</a>, <a href="#pkl_eval-format">format</a>, <a href="#pkl_eval-multiple_outputs">multiple_outputs</a>,
+         <a href="#pkl_eval-properties">properties</a>)
+</pre>
+
+
+
+**ATTRIBUTES**
+
+
+| Name  | Description | Type | Mandatory | Default |
+| :------------- | :------------- | :------------- | :------------- | :------------- |
+| <a id="pkl_eval-name"></a>name |  A unique name for this target.   | <a href="https://bazel.build/concepts/labels#target-names">Name</a> | required |  |
+| <a id="pkl_eval-deps"></a>deps |  Other targets to include in the pkl module path when building this configuration. Must be `pkl_*` targets.   | <a href="https://bazel.build/concepts/labels">List of labels</a> | optional |  `[]`  |
+| <a id="pkl_eval-srcs"></a>srcs |  -   | <a href="https://bazel.build/concepts/labels">List of labels</a> | optional |  `[]`  |
+| <a id="pkl_eval-data"></a>data |  Files to make available in the filesystem when building this configuration. These can be accessed by relative path.   | <a href="https://bazel.build/concepts/labels">List of labels</a> | optional |  `[]`  |
+| <a id="pkl_eval-outs"></a>outs |  Name of the output file to generate. Defaults to `<rule name>.<format>`. If the format attribute is unset, use `<rule name>.pcf`. Expects a single file if `multiple_outputs` is not set to `True`.   | List of strings | optional |  `[]`  |
+| <a id="pkl_eval-entrypoints"></a>entrypoints |  The pkl file to use as an entry point (needs to be part of the srcs). Typically a single file.   | <a href="https://bazel.build/concepts/labels">List of labels</a> | optional |  `[]`  |
+| <a id="pkl_eval-expression"></a>expression |  A pkl expression to evaluate within the module. Note that the `format` attribute does not affect how this renders.   | String | optional |  `""`  |
+| <a id="pkl_eval-format"></a>format |  The format of the generated file to pass when calling `pkl`. See https://pages.github.pie.apple.com/pkl/main/current/pkl-cli/index.html#options.   | String | optional |  `""`  |
+| <a id="pkl_eval-multiple_outputs"></a>multiple_outputs |  Whether to expect to render multiple file outputs. If `outs` is specified then individual generated files will be exposed. Otherwise, a single directory, with the name of the target, containing all generated files will be exposed. (see https://pkl.apple.com/main/current/language-reference/index.html#multiple-file-output).   | Boolean | optional |  `False`  |
+| <a id="pkl_eval-properties"></a>properties |  Dictionary of name value pairs used to pass in PKL external properties See the Pkl docs: https://pages.github.pie.apple.com/pkl/main/current/language-reference/index.html#resources   | <a href="https://bazel.build/rules/lib/dict">Dictionary: String -> String</a> | optional |  `{}`  |
 
 
 <a id="pkl_library"></a>
@@ -61,39 +89,13 @@ Collect Pkl sources together so they can be used by other `rules_pkl` rules.
 | <a id="pkl_library-data"></a>data |  Files to make available in the filesystem when building this configuration. These can be accessed by relative path.   | <a href="https://bazel.build/concepts/labels">List of labels</a> | optional |  `[]`  |
 
 
-<a id="pkl_eval"></a>
-
-## pkl_eval
-
-<pre>
-pkl_eval(<a href="#pkl_eval-name">name</a>, <a href="#pkl_eval-deps">deps</a>, <a href="#pkl_eval-srcs">srcs</a>, <a href="#pkl_eval-data">data</a>, <a href="#pkl_eval-out">out</a>, <a href="#pkl_eval-entrypoints">entrypoints</a>, <a href="#pkl_eval-expression">expression</a>, <a href="#pkl_eval-format">format</a>, <a href="#pkl_eval-multiple_outputs">multiple_outputs</a>, <a href="#pkl_eval-properties">properties</a>)
-</pre>
-
-
-
-**ATTRIBUTES**
-
-
-| Name  | Description | Type | Mandatory | Default |
-| :------------- | :------------- | :------------- | :------------- | :------------- |
-| <a id="pkl_eval-name"></a>name |  A unique name for this target.   | <a href="https://bazel.build/concepts/labels#target-names">Name</a> | required |  |
-| <a id="pkl_eval-deps"></a>deps |  Other targets to include in the pkl module path when building this configuration. Must be `pkl_*` targets.   | <a href="https://bazel.build/concepts/labels">List of labels</a> | optional |  `[]`  |
-| <a id="pkl_eval-srcs"></a>srcs |  -   | <a href="https://bazel.build/concepts/labels">List of labels</a> | optional |  `[]`  |
-| <a id="pkl_eval-data"></a>data |  Files to make available in the filesystem when building this configuration. These can be accessed by relative path.   | <a href="https://bazel.build/concepts/labels">List of labels</a> | optional |  `[]`  |
-| <a id="pkl_eval-out"></a>out |  Name of the output file to generate. Defaults to `<rule name>.<format>`. If the format attribute is unset, use `<rule name>.pcf`. This flag is mutually exclusive with the `multiple_outputs` attribute.   | <a href="https://bazel.build/concepts/labels">Label</a> | optional |  |
-| <a id="pkl_eval-entrypoints"></a>entrypoints |  The pkl file to use as an entry point (needs to be part of the srcs). Typically a single file.   | <a href="https://bazel.build/concepts/labels">List of labels</a> | optional |  `[]`  |
-| <a id="pkl_eval-expression"></a>expression |  A pkl expression to evaluate within the module. Note that the `format` attribute does not affect how this renders.   | String | optional |  `""`  |
-| <a id="pkl_eval-format"></a>format |  The format of the generated file to pass when calling `pkl`. See https://pages.github.pie.apple.com/pkl/main/current/pkl-cli/index.html#options.   | String | optional |  `""`  |
-| <a id="pkl_eval-multiple_outputs"></a>multiple_outputs |  Whether to expect to render multiple file outputs to a single directory with the name of the target (see https://pkl.apple.com/main/current/language-reference/index.html#multiple-file-output). This flag is mutually exclusive with the `out` attribute.   | Boolean | optional |  `False`  |
-| <a id="pkl_eval-properties"></a>properties |  Dictionary of name value pairs used to pass in PKL external properties See the Pkl docs: https://pages.github.pie.apple.com/pkl/main/current/language-reference/index.html#resources   | <a href="https://bazel.build/rules/lib/dict">Dictionary: String -> String</a> | optional |  `{}`  |
-
-
 <a id="pkl_test"></a>
 
 ## pkl_test
 
 <pre>
-pkl_test(<a href="#pkl_test-name">name</a>, <a href="#pkl_test-deps">deps</a>, <a href="#pkl_test-srcs">srcs</a>, <a href="#pkl_test-data">data</a>, <a href="#pkl_test-out">out</a>, <a href="#pkl_test-entrypoints">entrypoints</a>, <a href="#pkl_test-expression">expression</a>, <a href="#pkl_test-format">format</a>, <a href="#pkl_test-multiple_outputs">multiple_outputs</a>, <a href="#pkl_test-properties">properties</a>)
+pkl_test(<a href="#pkl_test-name">name</a>, <a href="#pkl_test-deps">deps</a>, <a href="#pkl_test-srcs">srcs</a>, <a href="#pkl_test-data">data</a>, <a href="#pkl_test-outs">outs</a>, <a href="#pkl_test-entrypoints">entrypoints</a>, <a href="#pkl_test-expression">expression</a>, <a href="#pkl_test-format">format</a>, <a href="#pkl_test-multiple_outputs">multiple_outputs</a>,
+         <a href="#pkl_test-properties">properties</a>)
 </pre>
 
 
@@ -107,11 +109,11 @@ pkl_test(<a href="#pkl_test-name">name</a>, <a href="#pkl_test-deps">deps</a>, <
 | <a id="pkl_test-deps"></a>deps |  Other targets to include in the pkl module path when building this configuration. Must be `pkl_*` targets.   | <a href="https://bazel.build/concepts/labels">List of labels</a> | optional |  `[]`  |
 | <a id="pkl_test-srcs"></a>srcs |  -   | <a href="https://bazel.build/concepts/labels">List of labels</a> | optional |  `[]`  |
 | <a id="pkl_test-data"></a>data |  Files to make available in the filesystem when building this configuration. These can be accessed by relative path.   | <a href="https://bazel.build/concepts/labels">List of labels</a> | optional |  `[]`  |
-| <a id="pkl_test-out"></a>out |  Name of the output file to generate. Defaults to `<rule name>.<format>`. If the format attribute is unset, use `<rule name>.pcf`. This flag is mutually exclusive with the `multiple_outputs` attribute.   | <a href="https://bazel.build/concepts/labels">Label</a> | optional |  |
+| <a id="pkl_test-outs"></a>outs |  Name of the output file to generate. Defaults to `<rule name>.<format>`. If the format attribute is unset, use `<rule name>.pcf`. Expects a single file if `multiple_outputs` is not set to `True`.   | List of strings | optional |  `[]`  |
 | <a id="pkl_test-entrypoints"></a>entrypoints |  The pkl file to use as an entry point (needs to be part of the srcs). Typically a single file.   | <a href="https://bazel.build/concepts/labels">List of labels</a> | optional |  `[]`  |
 | <a id="pkl_test-expression"></a>expression |  A pkl expression to evaluate within the module. Note that the `format` attribute does not affect how this renders.   | String | optional |  `""`  |
 | <a id="pkl_test-format"></a>format |  The format of the generated file to pass when calling `pkl`. See https://pages.github.pie.apple.com/pkl/main/current/pkl-cli/index.html#options.   | String | optional |  `""`  |
-| <a id="pkl_test-multiple_outputs"></a>multiple_outputs |  Whether to expect to render multiple file outputs to a single directory with the name of the target (see https://pkl.apple.com/main/current/language-reference/index.html#multiple-file-output). This flag is mutually exclusive with the `out` attribute.   | Boolean | optional |  `False`  |
+| <a id="pkl_test-multiple_outputs"></a>multiple_outputs |  Whether to expect to render multiple file outputs. If `outs` is specified then individual generated files will be exposed. Otherwise, a single directory, with the name of the target, containing all generated files will be exposed. (see https://pkl.apple.com/main/current/language-reference/index.html#multiple-file-output).   | Boolean | optional |  `False`  |
 | <a id="pkl_test-properties"></a>properties |  Dictionary of name value pairs used to pass in PKL external properties See the Pkl docs: https://pages.github.pie.apple.com/pkl/main/current/language-reference/index.html#resources   | <a href="https://bazel.build/rules/lib/dict">Dictionary: String -> String</a> | optional |  `{}`  |
 
 
@@ -131,7 +133,7 @@ pkl_toolchain(<a href="#pkl_toolchain-name">name</a>, <a href="#pkl_toolchain-cl
 | Name  | Description | Type | Mandatory | Default |
 | :------------- | :------------- | :------------- | :------------- | :------------- |
 | <a id="pkl_toolchain-name"></a>name |  A unique name for this target.   | <a href="https://bazel.build/concepts/labels#target-names">Name</a> | required |  |
-| <a id="pkl_toolchain-cli"></a>cli |  -   | <a href="https://bazel.build/concepts/labels">Label</a> | optional |  `//pkl:pkl_cli`  |
+| <a id="pkl_toolchain-cli"></a>cli |  -   | <a href="https://bazel.build/concepts/labels">Label</a> | optional |  `None`  |
 
 
 <a id="pkl_config_java_library"></a>
@@ -204,7 +206,7 @@ pkl_doc(<a href="#pkl_doc-name">name</a>, <a href="#pkl_doc-srcs">srcs</a>, <a h
 ## pkl_test_suite
 
 <pre>
-pkl_test_suite(<a href="#pkl_test_suite-name">name</a>, <a href="#pkl_test_suite-srcs">srcs</a>, <a href="#pkl_test_suite-deps">deps</a>, <a href="#pkl_test_suite-tags">tags</a>, <a href="#pkl_test_suite-visibility">visibility</a>, <a href="#pkl_test_suite-size">size</a>, <a href="#pkl_test_suite-test_suffix">test_suffix</a>, <a href="#pkl_test_suite-executor">executor</a>, <a href="#pkl_test_suite-kwargs">kwargs</a>)
+pkl_test_suite(<a href="#pkl_test_suite-name">name</a>, <a href="#pkl_test_suite-srcs">srcs</a>, <a href="#pkl_test_suite-deps">deps</a>, <a href="#pkl_test_suite-tags">tags</a>, <a href="#pkl_test_suite-visibility">visibility</a>, <a href="#pkl_test_suite-size">size</a>, <a href="#pkl_test_suite-test_suffix">test_suffix</a>, <a href="#pkl_test_suite-kwargs">kwargs</a>)
 </pre>
 
 Create a suite of pkl tests from the provided files.
@@ -227,7 +229,6 @@ Given the list of `srcs`, this macro will generate:
 | <a id="pkl_test_suite-visibility"></a>visibility |  <p align="center"> - </p>   |  `None` |
 | <a id="pkl_test_suite-size"></a>size |  <p align="center"> - </p>   |  `None` |
 | <a id="pkl_test_suite-test_suffix"></a>test_suffix |  <p align="center"> - </p>   |  `None` |
-| <a id="pkl_test_suite-executor"></a>executor |  <p align="center"> - </p>   |  `None` |
 | <a id="pkl_test_suite-kwargs"></a>kwargs |  <p align="center"> - </p>   |  none |
 
 

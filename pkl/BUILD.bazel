@@ -124,7 +124,7 @@ toolchain(
 )
 
 bzl_library(
-    name = "docs",
+    name = "defs",
     srcs = glob(["*.bzl"]),
     visibility = ["//visibility:public"],
     deps = [
