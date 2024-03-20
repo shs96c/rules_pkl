@@ -1,4 +1,72 @@
-load("//pkl:defs.bzl", "pkl_eval")
+load("//pkl:defs.bzl", "pkl_eval", "pkl_library")
+
+pkl_eval(
+    name = "pkl_eval_with_src_dep",
+    srcs = [
+        "srcs/pets.pkl",
+        "srcs/pets_override.pkl",
+    ],
+    entrypoints = ["srcs/pets_override.pkl"],
+)
+
+sh_test(
+    name = "test_pkl_eval_with_src_dep",
+    srcs = ["verify_generated_pkl.sh"],
+    args = [
+        "expected/pets.pcf",
+        "pkl_eval_with_src_dep/pkl_eval_with_src_dep.pcf",
+    ],
+    data = [
+        "expected/pets.pcf",
+        ":pkl_eval_with_src_dep",
+    ],
+)
+
+pkl_library(
+    name = "pets_pkl_lib",
+    srcs = ["srcs/pets.pkl"],
+)
+
+pkl_eval(
+    name = "pkl_eval_with_lib_dep",
+    srcs = [
+        "srcs/pets_override.pkl",
+    ],
+    entrypoints = ["srcs/pets_override.pkl"],
+    deps = [":pets_pkl_lib"],
+)
+
+sh_test(
+    name = "test_pkl_eval_with_lib_dep",
+    srcs = ["verify_generated_pkl.sh"],
+    args = [
+        "expected/pets.pcf",
+        "pkl_eval_with_lib_dep/pkl_eval_with_lib_dep.pcf",
+    ],
+    data = [
+        "expected/pets.pcf",
+        ":pkl_eval_with_lib_dep",
+    ],
+)
+
+pkl_eval(
+    name = "pkl_eval_with_ext_lib_dep",
+    srcs = ["srcs/pets_with_ext_lib_dep.pkl"],
+    deps = ["//test/pkl_eval/srcs/foo:my_pets"],
+)
+
+sh_test(
+    name = "test_pkl_eval_with_ext_lib_dep",
+    srcs = ["verify_generated_pkl.sh"],
+    args = [
+        "expected/pets.pcf",
+        "pkl_eval_with_ext_lib_dep/pkl_eval_with_ext_lib_dep.pcf",
+    ],
+    data = [
+        "expected/pets.pcf",
+        ":pkl_eval_with_ext_lib_dep",
+    ],
+)
 
 pkl_eval(
     name = "pkl_eval_without_out",
@@ -72,5 +140,24 @@ sh_test(
     data = [
         "expected/single_output_not_specified.txt",
         ":pkl_eval_without_out",
+    ],
+)
+
+pkl_eval(
+    name = "pets_without_rabbit",
+    srcs = ["srcs/animals.pkl"],
+    expression = "animals.filter((x) -> x != \"bird\")",
+)
+
+sh_test(
+    name = "test_pkl_eval_with_expression",
+    srcs = ["verify_generated_pkl.sh"],
+    args = [
+        "expected/filtered_animals.pcf",
+        "pets_without_rabbit/pets_without_rabbit.pcf",
+    ],
+    data = [
+        "expected/filtered_animals.pcf",
+        ":pets_without_rabbit",
     ],
 )

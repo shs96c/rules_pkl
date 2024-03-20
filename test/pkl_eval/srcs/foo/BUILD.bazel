@@ -1,0 +1,7 @@
+load("//pkl:defs.bzl", "pkl_library")
+
+pkl_library(
+    name = "my_pets",
+    srcs = ["pets.pkl"],
+    visibility = ["//visibility:public"],
+)

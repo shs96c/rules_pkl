@@ -1,0 +1,6 @@
+pets {
+  "dog"
+  "cat"
+  "rabbit"
+  "hamster"
+}

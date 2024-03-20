@@ -1,0 +1,9 @@
+import "pets.pkl"
+
+myPets {
+  for (_pet in pets.pets) {
+    _pet
+  }
+}
+
+
