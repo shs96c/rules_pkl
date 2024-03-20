@@ -1,3 +1,7 @@
+"""
+Implementation for 'pkl_eval' and 'pkl_test' rules.
+"""
+
 load(":providers.bzl", "PklFileInfo")
 
 def _best_path(file):
@@ -135,6 +139,7 @@ def _prepare_pkl_script(ctx):
 _PKL_EVAL_ATTRS = {
     "srcs": attr.label_list(
         allow_files = [".pkl"],
+        doc = "The Pkl source files to be evaluated.",
     ),
     "data": attr.label_list(
         allow_files = True,
@@ -165,7 +170,7 @@ _PKL_EVAL_ATTRS = {
         doc = "Name of the output file to generate. Defaults to `<rule name>.<format>`. If the format attribute is unset, use `<rule name>.pcf`. Expects a single file if `multiple_outputs` is not set to `True`.",
     ),
     "properties": attr.string_dict(
-        doc = """Dictionary of name value pairs used to pass in PKL external properties
+        doc = """Dictionary of name value pairs used to pass in Pkl external properties.
             See the Pkl docs: https://pages.github.pie.apple.com/pkl/main/current/language-reference/index.html#resources""",
     ),
     "_pkl_script": attr.label(
@@ -237,6 +242,7 @@ pkl_eval = rule(
     toolchains = [
         "//pkl:toolchain_type",
     ],
+    doc = "Evaluate Pkl module(s).",
 )
 
 def _pkl_test_impl(ctx):
@@ -274,4 +280,5 @@ pkl_test = rule(
     toolchains = [
         "//pkl:toolchain_type",
     ],
+    doc = "Create a Pkl test that can be run with Bazel.",
 )

@@ -1,3 +1,7 @@
+"""
+Module extension for using rules_pkl with bzlmod.
+"""
+
 load("//pkl:repositories.bzl", "pkl_cli_binaries")
 load("//pkl/private:pkl_deps.bzl", "parse_pkl_project_deps_json", "pkl_deps")
 load("//pkl/private:remote_pkl_package.bzl", "remote_pkl_package")

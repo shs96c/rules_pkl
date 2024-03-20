@@ -1,3 +1,7 @@
+"""
+Constants.
+"""
+
 PKL_DEPS = [
     "com.google.code.gson:gson:2.10.1",
     "com.apple.pkl:pkl-codegen-java:0.24.6",

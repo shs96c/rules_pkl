@@ -1,6 +1,16 @@
+"""
+Repository rule that makes Pkl packages available in the cache.
+"""
+
 load(":pkl_package_names.bzl", "transform_package_url_to_workspace_name")
 
 def parse_pkl_project_deps_json(pkl_deps_json_string):
+    """Parses the contents of a JSON file containing Pkl Project dependencies.
+    Args:
+        pkl_deps_json_string: path to JSON file containing Pkl Project dependencies.
+    Returns:
+        A list of structs containing Pkl dependency data.
+    """
     lock_file_contents = json.decode(pkl_deps_json_string)
 
     if lock_file_contents["schemaVersion"] != 1:

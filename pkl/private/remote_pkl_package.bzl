@@ -1,3 +1,7 @@
+"""
+Repository rule for downloading remote Pkl packages.
+"""
+
 load(":pkl_package_names.bzl", "get_terminal_package_name")
 
 def _remote_pkl_package_impl(rctx):

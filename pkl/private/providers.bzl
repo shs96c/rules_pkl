@@ -1,3 +1,7 @@
+"""
+Definition for Pkl Providers.
+"""
+
 PklFileInfo = provider(
     doc = "A combination of base Pkl files (from `pkl_library`) and cache entries, required to evaluate `pkl_eval` rules",
     fields = {

@@ -1,3 +1,7 @@
+"""
+Implementation of toolchains for Pkl.
+"""
+
 def _pkl_toolchain_impl(ctx):
     all_runfiles = ctx.runfiles(files = [ctx.attr.cli[DefaultInfo].files_to_run.executable])
     all_runfiles = all_runfiles.merge(ctx.attr.cli[DefaultInfo].default_runfiles)

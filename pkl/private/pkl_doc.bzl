@@ -1,4 +1,9 @@
+"""
+Implementation of 'pkl_doc' macro.
+"""
+
 def _pkl_doc_impl(ctx):
+    """Generate HTML documentation from Pkl files."""
     modules = [module.path for module in ctx.files.deps]
 
     # Generate HTML from Pkl
@@ -41,12 +46,16 @@ _pkl_doc = rule(
         "srcs": attr.label_list(
             mandatory = True,
             allow_files = [".pkl"],
+            doc = "The Pkl soruce files used to generate the documentation.",
         ),
         "deps": attr.label_list(
             mandatory = False,
             allow_files = [".pkl"],
+            doc = "Other targets to include in the Pkl module path when generating the documentation.",
         ),
-        "out": attr.output(),
+        "out": attr.output(
+            doc = "The generated output zip file containing pkl documentation.",
+        ),
         "_pkl_doc_cli": attr.label(
             cfg = "exec",
             default = "//pkl:pkl_doc_cli",
@@ -62,6 +71,13 @@ _pkl_doc = rule(
 )
 
 def pkl_doc(name, srcs, **kwargs):
+    """Generate documentation website for Pkl files.
+
+    Args:
+        name: A unique name for this target.
+        srcs: The Pkl source files to be documented.
+        **kwargs: Further keyword arguments. E.g. visibility
+    """
     if "out" not in kwargs:
         kwargs["out"] = name + "_docs.zip"
     _pkl_doc(

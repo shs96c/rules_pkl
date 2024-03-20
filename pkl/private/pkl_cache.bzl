@@ -1,3 +1,7 @@
+"""
+Cache Pkl packages.
+"""
+
 load(":pkl_package_names.bzl", "get_terminal_package_name")
 load(":providers.bzl", "PklCacheInfo", "PklFileInfo")
 
@@ -7,6 +11,7 @@ PklCacheEntryInfo = provider(
         "json": "The JSON file",
         "zip": "The zip file",
     },
+    doc = "A provider containing information about a single entry in the Pkl cache.",
 )
 
 def _pkl_cached_package(ctx):

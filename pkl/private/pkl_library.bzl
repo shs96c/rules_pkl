@@ -1,3 +1,7 @@
+"""
+Implementation of 'pkl_library' rule.
+"""
+
 load(":providers.bzl", "PklFileInfo")
 
 def _pkl_library_impl(ctx):
@@ -33,15 +37,17 @@ pkl_library = rule(
         "srcs": attr.label_list(
             mandatory = True,
             allow_files = [".pkl"],
+            doc = "The Pkl source files to include in this library.",
         ),
         "deps": attr.label_list(
             providers = [
                 [PklFileInfo],
             ],
+            doc = "Other targets to include in the pkl module path when building this library. Must be pkl_* targets.",
         ),
         "data": attr.label_list(
             allow_files = True,
-            doc = "Files to make available in the filesystem when building this configuration. These can be accessed by relative path.",
+            doc = "Files to make available in the filesystem when building this library target. These can be accessed by relative path.",
         ),
     },
 )

@@ -1,4 +1,6 @@
-"Public API re-exports"
+"""
+Public API re-exports
+"""
 
 load("//pkl/private:pkl.bzl", _pkl_eval = "pkl_eval", _pkl_test = "pkl_test")
 load("//pkl/private:pkl_codegen.bzl", _pkl_config_java_library = "pkl_config_java_library", _pkl_config_src = "pkl_config_src")
