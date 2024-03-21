@@ -4,13 +4,13 @@
 
 expected_output=$1
 command=$2
-format_args=$3
-entrypoints=$4
-multiple_outputs=$5
-working_dir=$6
-executable=$7
-symlinks_json_file_path=$8
-symlinks_executable=$9
+executable=$3
+symlinks_json_file_path=$4
+symlinks_executable=$5
+format_args=$6
+entrypoints=$7
+multiple_outputs=$8
+working_dir=$9
 
 shift 9
 properties_and_expressions=("$@")

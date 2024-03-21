@@ -16,9 +16,8 @@ def _best_path(file):
         # already, so we can use that.
         return file.short_path
 
-def _prepare_pkl_script(ctx):
+def _prepare_pkl_script(ctx, is_test_target):
     pkl_toolchain = ctx.toolchains["//pkl:toolchain_type"]
-
     executable = pkl_toolchain.cli[DefaultInfo].files_to_run.executable
 
     # Build a forest of symlinks. Why do we need to this? It's because
@@ -68,39 +67,25 @@ def _prepare_pkl_script(ctx):
 
     symlinks_json_file = ctx.actions.declare_file(ctx.label.name + "_symlinks.json")
     ctx.actions.write(output = symlinks_json_file, content = json.encode(path_to_symlink_target))
-    pkl_symlink_tool = pkl_toolchain.symlink_tool
+    pkl_symlink_tool = pkl_toolchain.symlink_tool[DefaultInfo].files_to_run.executable
 
-    # The 'run_args' and 'test_args' need to be separate to support '--experimental_output_path=strip' until the following
-    # upstream PR is merged (https://github.com/bazelbuild/bazel/pull/16430) as Bazel only performs path stripping on paths in
-    # 'ctx.Args' object, which can't be used in test actions.
-    common_args = [
+    args = [
+        executable.short_path if is_test_target else executable,
+        symlinks_json_file.short_path if is_test_target else symlinks_json_file,
+        pkl_symlink_tool.short_path if is_test_target else pkl_symlink_tool,
         "--format {}".format(ctx.attr.format) if ctx.attr.format else "",
         " ".join([f.path for f in (ctx.files.entrypoints or ctx.files.srcs)]),
         ctx.attr.multiple_outputs,
         working_dir,
     ]
 
-    run_args = common_args + [
-        executable,
-        symlinks_json_file,
-        pkl_symlink_tool[DefaultInfo].files_to_run.executable.path,
-    ]
-
-    test_args = common_args + [
-        executable.short_path,
-        symlinks_json_file.short_path,
-        pkl_symlink_tool[DefaultInfo].files_to_run.executable.short_path,
-    ]
-
     for k, v in ctx.attr.properties.items():
         property_flag = ["--property", "{}={}".format(k, ctx.expand_location(v, ctx.attr.data))]
-        run_args += property_flag
-        test_args += property_flag
+        args += property_flag
 
     if getattr(ctx.attr, "expression"):
         expression_flag = ["-x", ctx.attr.expression]
-        run_args += expression_flag
-        test_args += expression_flag
+        args += expression_flag
 
     script = ctx.executable._pkl_script
 
@@ -134,7 +119,8 @@ def _prepare_pkl_script(ctx):
     ).merge(
         pkl_toolchain.cli[DefaultInfo].default_runfiles,
     )
-    return script, runfiles, run_args, test_args
+
+    return script, runfiles, args
 
 _PKL_EVAL_ATTRS = {
     "srcs": attr.label_list(
@@ -181,7 +167,9 @@ _PKL_EVAL_ATTRS = {
 }
 
 def _pkl_eval_impl(ctx):
-    script, runfiles, run_args, _ = _prepare_pkl_script(ctx)
+    pkl_toolchain = ctx.toolchains["//pkl:toolchain_type"]
+
+    script, runfiles, common_args = _prepare_pkl_script(ctx, is_test_target = False)
 
     if not ctx.attr.multiple_outputs and len(ctx.attr.outs) > 1:
         fail("expecting single output file, however {outputs_count} outputs have been specified. Set `multiple_outputs=True` if expecting multiple outputs."
@@ -211,12 +199,13 @@ def _pkl_eval_impl(ctx):
         output_location = ctx.actions.declare_file(relative_path)
         outputs.append(output_location)
 
-    pkl_toolchain = ctx.toolchains["//pkl:toolchain_type"]
-
     pkl_command = "eval"
     args = ctx.actions.args()
     args.add_all(
-        [output_location, pkl_command] + run_args,
+        [
+            output_location,
+            pkl_command,
+        ] + common_args,
         expand_directories = False,
     )
 
@@ -246,13 +235,15 @@ pkl_eval = rule(
 )
 
 def _pkl_test_impl(ctx):
-    script, runfiles, _, test_args = _prepare_pkl_script(ctx)
+    script, runfiles, common_args = _prepare_pkl_script(ctx, is_test_target = True)
 
     output_script = ctx.actions.declare_file(ctx.label.name + ".sh")
 
     pkl_command = "test"
-
-    test_args = [output_script.path, pkl_command] + test_args
+    test_args = [
+        output_script.path,
+        pkl_command,
+    ] + common_args
     args_str = " ".join(["'{}'".format(str(a).replace("'", "\\'")) for a in test_args])
 
     cmd = """#!/usr/bin/env bash
