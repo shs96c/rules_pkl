@@ -228,7 +228,7 @@ Given the list of `srcs`, this macro will generate:
 | <a id="pkl_test_suite-deps"></a>deps |  Other targets to include in the Pkl module path when building this configuration. Must be pkl_* targets.   |  `None` |
 | <a id="pkl_test_suite-tags"></a>tags |  Tags to add to each Pkl test target.   |  `[]` |
 | <a id="pkl_test_suite-visibility"></a>visibility |  The visibility of non test Pkl source files.   |  `None` |
-| <a id="pkl_test_suite-size"></a>size |  ???. - MAY NOT NEED THIS?????   |  `None` |
+| <a id="pkl_test_suite-size"></a>size |  Size of Pkl test.   |  `None` |
 | <a id="pkl_test_suite-test_suffix"></a>test_suffix |  A custom suffix indicating a source file is a Pkl test file.   |  `None` |
 | <a id="pkl_test_suite-kwargs"></a>kwargs |  Further keyword arguments.   |  none |
 

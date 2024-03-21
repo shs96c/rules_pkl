@@ -28,7 +28,7 @@ def pkl_test_suite(
         deps: Other targets to include in the Pkl module path when building this configuration. Must be pkl_* targets.
         tags: Tags to add to each Pkl test target.
         visibility: The visibility of non test Pkl source files.
-        size: ???. - MAY NOT NEED THIS?????
+        size: Size of Pkl test.
         test_suffix: A custom suffix indicating a source file is a Pkl test file.
         **kwargs: Further keyword arguments.
 
