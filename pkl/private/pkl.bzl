@@ -69,6 +69,10 @@ def _prepare_pkl_script(ctx, is_test_target):
     ctx.actions.write(output = symlinks_json_file, content = json.encode(path_to_symlink_target))
     pkl_symlink_tool = pkl_toolchain.symlink_tool[DefaultInfo].files_to_run.executable
 
+    # The 'args' lists for 'pkl_eval' and 'pkl_test' differ because for `pkl_eval`, files are passed as file targets to enable
+    # path stripping on the `ctx.Args` object when using the '--experimental_output_path=strip' flag. Currently, test rules
+    # don't support using the `ctx.Args` object, which will be addressed by the following upstream PR
+    # (https://github.com/bazelbuild/bazel/pull/16430).
     args = [
         executable.short_path if is_test_target else executable,
         symlinks_json_file.short_path if is_test_target else symlinks_json_file,
