@@ -1,0 +1,36 @@
+load("@rules_pkl//pkl:defs.bzl", "pkl_eval", "pkl_library")
+load("@rules_pkg//pkg:pkg.bzl", "pkg_tar")
+load("@rules_pkg//pkg:mappings.bzl", "strip_prefix")
+
+pkl_eval(
+    name = "dogs",
+    srcs = ["dogs.pkl"],
+)
+
+pkl_eval(
+    name = "cats",
+    srcs = ["cats.pkl"],
+    outs = [
+        "cats.json",
+        "cats.yaml",
+    ],
+    multiple_outputs = True,
+)
+
+#  Collect all outputs of :dogs and :cats targets and `hamster.pcf` into a single target.
+filegroup(
+    name = "all_pet_files",
+    srcs = [
+        "hamster.pcf",
+        ":cats",
+        ":dogs",
+    ],
+)
+
+# Generates tarball of generated Pkl files.
+pkg_tar(
+    name = "pets_tarball",
+    srcs = [":all_pet_files"],
+    # Add tarball files relative to the workspace root (`example/pets/cats.json`, etc.).
+    strip_prefix = strip_prefix.from_root(),
+)

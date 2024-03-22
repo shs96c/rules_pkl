@@ -1,0 +1,17 @@
+cats {
+  "Matilda"
+  "Felix"
+  "Jazz"
+}
+
+output {
+  files {
+    ["cats.json"] {
+      value = cats
+      renderer = new JsonRenderer {}
+    }
+    ["cats.yaml"] {
+      renderer = new YamlRenderer {}
+    }
+  }
+}

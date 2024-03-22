@@ -3,3 +3,5 @@ local_path_override(
     module_name = "rules_pkl",
     path = "..",
 )
+
+bazel_dep(name = "rules_pkg", version = "0.10.1")
