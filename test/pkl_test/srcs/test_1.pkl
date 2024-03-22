@@ -7,4 +7,5 @@ facts {
         cat.WhiskersCount == 6
         cat.CatName == "Puddles"
     }
+
 }

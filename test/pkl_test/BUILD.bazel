@@ -1,19 +1,19 @@
 load("//pkl:defs.bzl", "pkl_eval", "pkl_test", "pkl_test_suite")
 
 pkl_test(
-    name = "pkl_test_1",
+    name = "simple_test",
     srcs = ["srcs/test_1.pkl"],
     data = ["srcs/cat.pkl"],
 )
 
 pkl_eval(
-    name = "pkl_eval_1",
+    name = "pkl_eval",
     srcs = ["srcs/test_1.pkl"],
     data = ["srcs/cat.pkl"],
 )
 
 pkl_test(
-    name = "pkl_test_2",
+    name = "empty_pkl_test",
     srcs = ["srcs/test_2.pkl"],
 )
 

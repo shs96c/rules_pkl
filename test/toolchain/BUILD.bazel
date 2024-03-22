@@ -6,7 +6,7 @@ current_pkl_toolchain(
 )
 
 genrule(
-    name = "test_current_toolchain_at_build_time_bash",
+    name = "current_toolchain_at_build_time_test_bash",
     srcs = [
         "test_current_toolchain.sh",
     ],
@@ -22,15 +22,15 @@ genrule(
 )
 
 sh_test(
-    name = "test_current_toolchain_at_build_time",
-    srcs = ["test_current_toolchain_at_build_time_bash"],
+    name = "current_toolchain_at_build_time_test",
+    srcs = ["current_toolchain_at_build_time_test_bash"],
     toolchains = [
         ":current_toolchain",
     ],
 )
 
 sh_test(
-    name = "test_current_toolchain_at_runtime",
+    name = "current_toolchain_at_runtime_test",
     srcs = ["test_current_toolchain_runtime.sh"],
     data = [":current_toolchain"],
     env = {
@@ -40,7 +40,7 @@ sh_test(
 )
 
 sh_test(
-    name = "test_current_toolchain_at_runtime_pkl_java",
+    name = "current_toolchain_at_runtime_pkl_java_test",
     srcs = ["test_current_toolchain_runtime.sh"],
     data = ["//pkl:pkl_java"],
     env = {

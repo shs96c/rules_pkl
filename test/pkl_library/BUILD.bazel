@@ -19,8 +19,8 @@ filegroup(
 )
 
 py_test(
-    name = "test_transitive_sources",
-    srcs = ["test_transitive_sources.py"],
+    name = "transitive_sources_test",
+    srcs = ["transitive_sources_test.py"],
     data = [
         ":transitive_sources",
     ],
