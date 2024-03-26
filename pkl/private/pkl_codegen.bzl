@@ -22,7 +22,6 @@ def _zipit(ctx, outfile, files):
 def _pkl_codegen_impl(ctx):
     modules = depset(transitive = [depset(dep[JavaInfo].runtime_output_jars) for dep in ctx.attr.module_path]).to_list()
     java_codegen_toolchain = ctx.toolchains["//pkl:codegen_toolchain_type"]
-    codegen_cli = java_codegen_toolchain.codegen_cli
 
     # Generate Java from PKL
     outdir = ctx.actions.declare_directory(ctx.attr.name, sibling = None)

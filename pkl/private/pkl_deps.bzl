@@ -17,7 +17,7 @@ def parse_pkl_project_deps_json(pkl_deps_json_string):
         fail("Unknown schema version in lock file:", lock_file_contents["schemaVersion"])
 
     seen_remote_pkl_packages = {}
-    for (package_name, data) in lock_file_contents["resolvedDependencies"].items():
+    for (_, data) in lock_file_contents["resolvedDependencies"].items():
         if data.get("type") != "remote":
             fail("Unsupported type", data)
 
