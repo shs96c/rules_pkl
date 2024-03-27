@@ -32,14 +32,6 @@ def pkl_cli_binaries():
         executable = True,
     )
 
-    maybe(
-        http_file,
-        name = "pkl-cli-java",
-        url = "https://artifacts.apple.com/artifactory/pcl-release-local/com/apple/pkl/pkl-cli-java/0.24.6/pkl-cli-java-0.24.6.jar",
-        sha256 = "c279c9c7b0d87843a75794bca52f9e5dae2614796cff47a08dce24c029492e72",
-        executable = True,
-    )
-
 def pkl_setup():
     pkl_cli_binaries()
 

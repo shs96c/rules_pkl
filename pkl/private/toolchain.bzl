@@ -13,7 +13,7 @@ def _pkl_toolchain_impl(ctx):
     )
 
     make_variables = platform_common.TemplateVariableInfo({
-        "PKL_BIN": ctx.executable.cli.path,
+        "PKL_BIN": ctx.executable.cli.short_path if JavaInfo in ctx.attr.cli else ctx.executable.cli.path,
     })
     toolchain_info = platform_common.ToolchainInfo(
         cli = ctx.attr.cli,

@@ -19,6 +19,11 @@ Some targets are generated from sources.
 Currently this is just the `bzl_library` targets.
 Run `bazel run //:gazelle` to keep them up-to-date.
 
+## Updating maven lock files
+
+Once the `MODULE.bazel` and `//pkl:private:constants.bzl` files have been updated, you
+can update the maven lock file using `bazel run @unpinned_rules_pkl_deps//:pin`.
+
 ## Using this as a development dependency of other rules
 
 You'll commonly find that you develop in another WORKSPACE, such as

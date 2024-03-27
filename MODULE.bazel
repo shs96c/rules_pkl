@@ -19,7 +19,6 @@ bazel_dep(name = "aspect_bazel_lib", version = "2.5.3")
 pkl = use_extension("//pkl:extensions.bzl", "pkl")
 use_repo(
     pkl,
-    "pkl-cli-java",
     "pkl-cli-linux-arm64",
     "pkl-cli-linux-x86_64",
     "pkl-cli-macos",
@@ -27,7 +26,6 @@ use_repo(
 
 register_toolchains(
     "@rules_pkl//pkl:codegen-toolchain",
-    "@rules_pkl//pkl:pkl_toolchain_java",
     "@rules_pkl//pkl:pkl_toolchain_macos_arm64",
     "@rules_pkl//pkl:pkl_toolchain_macos_x86_64",
     "@rules_pkl//pkl:pkl_toolchain_linux_arm64",
@@ -38,12 +36,13 @@ maven = use_extension("@rules_jvm_external//:extensions.bzl", "maven")
 maven.install(
     name = "rules_pkl_deps",
     artifacts = [
-        "com.google.code.gson:gson:2.10.1",
+        "com.apple.pkl:pkl-cli-java:0.24.6",
         "com.apple.pkl:pkl-codegen-java:0.24.6",
         "com.apple.pkl:pkl-config-java:0.24.6",
-        "com.apple.pkl:pkl-tools:0.24.6",
-        "org.junit.vintage:junit-vintage-engine:5.7.0",
         "com.apple.pkl:pkl-doc:0.24.6",
+        "com.apple.pkl:pkl-tools:0.24.6",
+        "com.google.code.gson:gson:2.10.1",
+        "org.junit.vintage:junit-vintage-engine:5.7.0",
     ],
     lock_file = "//pkl/private:pkl_deps_install.json",
     repositories = [

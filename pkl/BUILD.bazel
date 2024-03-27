@@ -81,9 +81,20 @@ toolchain(
     toolchain_type = ":toolchain_type",
 )
 
+java_binary(
+    name = "pkl_cli_java",
+    main_class = "org.pkl.cli.Main",
+    runtime_deps = [
+        artifact(
+            "com.apple.pkl:pkl-cli-java",
+            repository_name = "rules_pkl_deps",
+        ),
+    ],
+)
+
 pkl_toolchain(
     name = "pkl_java",
-    cli = "@pkl-cli-java//file",
+    cli = ":pkl_cli_java",
     visibility = ["//visibility:public"],
 )
 
