@@ -5,9 +5,9 @@ validation. It can be used from the command line, integrated in a build pipeline
 program. Pkl scales from small to large, simple to complex, ad-hoc to repetitive configuration
 tasks.
 
-For further information about Pkl, check out the [official PKL documentation][].
+For further information about Pkl, check out the [official Pkl documentation][].
 
-[official PKL documentation]: https://pkl-lang.org/main/current/index.html
+[official Pkl documentation]: https://pkl-lang.org/main/current/index.html
 [pkl]: https://pkl-lang.org
 
 
