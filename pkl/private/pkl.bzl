@@ -149,19 +149,19 @@ _PKL_EVAL_ATTRS = {
         doc = "A pkl expression to evaluate within the module. Note that the `format` attribute does not affect how this renders.",
     ),
     "format": attr.string(
-        doc = "The format of the generated file to pass when calling `pkl`. See https://pages.github.pie.apple.com/pkl/main/current/pkl-cli/index.html#options.",
+        doc = "The format of the generated file to pass when calling `pkl`. See https://pkl-lang.org/main/current/pkl-cli/index.html#command-eval.",
     ),
     "multiple_outputs": attr.bool(
         doc = """Whether to expect to render multiple file outputs. If `outs` is specified then individual generated files will
         be exposed. Otherwise, a single directory, with the name of the target, containing all generated files will be exposed.
-        (see https://pkl.apple.com/main/current/language-reference/index.html#multiple-file-output).""",
+        (see https://pkl-lang.org/main/current/pkl-cli/index.html#command-eval).""",
     ),
     "outs": attr.string_list(
         doc = "Name of the output file to generate. Defaults to `<rule name>.<format>`. If the format attribute is unset, use `<rule name>.pcf`. Expects a single file if `multiple_outputs` is not set to `True`.",
     ),
     "properties": attr.string_dict(
         doc = """Dictionary of name value pairs used to pass in Pkl external properties.
-            See the Pkl docs: https://pages.github.pie.apple.com/pkl/main/current/language-reference/index.html#resources""",
+            See the Pkl docs: https://pkl-lang.org/main/current/pkl-cli/index.html#command-eval""",
     ),
     "_pkl_script": attr.label(
         default = "//pkl/private:run_pkl_script",

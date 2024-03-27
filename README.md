@@ -7,8 +7,8 @@ tasks.
 
 For further information about Pkl, check out the [official PKL documentation][].
 
-[official PKL documentation]: https://pkl.apple.com/main/current/index.html
-[pkl]: https://pkl.apple.com
+[official PKL documentation]: https://pkl-lang.org/main/current/index.html
+[pkl]: https://pkl-lang.org
 
 
 ## Quick Start
