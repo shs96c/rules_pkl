@@ -10,25 +10,33 @@ load("//pkl/private:constants.bzl", "PKL_DEPS")
 def pkl_cli_binaries():
     maybe(
         http_file,
-        name = "pkl-cli-macos",
-        url = "https://artifacts.apple.com/artifactory/pcl-release-local/com/apple/pkl/pkl-cli-macos/0.24.6/pkl-cli-macos-0.24.6.bin",
-        sha256 = "8f3a016b79796d63913afa9f56c3f91161bc3d6ae05ca7a63f8cc699b6c07654",
+        name = "pkl-cli-macos-aarch64",
+        url = "https://github.com/apple/pkl/releases/download/0.25.3/pkl-macos-aarch64",
+        sha256 = "5a8efc3ab69ec96a6505ad6d0dd2ef6780319b0d0e65eee1872ad23fabb5ad5b",
         executable = True,
     )
 
     maybe(
         http_file,
-        name = "pkl-cli-linux-arm64",
-        url = "https://artifacts.apple.com/artifactory/pcl-release-local/com/apple/pkl/pkl-cli-linux-aarch64/0.24.6/pkl-cli-linux-aarch64-0.24.6.bin",
-        sha256 = "7aae0eb3f9227ede086d34d687e720e1ce2df3b857d59bf2b69fb5896cb1c273",
+        name = "pkl-cli-macos-x86_64",
+        url = "https://github.com/apple/pkl/releases/download/0.25.3/pkl-macos-amd64",
+        sha256 = "66916a9402e788d01056f5734239e8d2c5a0d0006d1ad45bf8a56abd1ca855c6",
+        executable = True,
+    )
+
+    maybe(
+        http_file,
+        name = "pkl-cli-linux-aarch64",
+        url = "https://github.com/apple/pkl/releases/download/0.25.3/pkl-linux-aarch64",
+        sha256 = "5b77b88c15bfa41028da399eb5f3c01ed72a8ca4ea1f3ffe3bc1f56ec63a773b",
         executable = True,
     )
 
     maybe(
         http_file,
         name = "pkl-cli-linux-x86_64",
-        url = "https://artifacts.apple.com/artifactory/pcl-release-local/com/apple/pkl/pkl-cli-linux-amd64/0.24.6/pkl-cli-linux-amd64-0.24.6.bin",
-        sha256 = "313465d132b838ca14c2090c5a26a643de899ef831c6155ef03407c450eeda8d",
+        url = "https://github.com/apple/pkl/releases/download/0.25.3/pkl-linux-amd64",
+        sha256 = "fb2c8ad5de113a1246599e893492736b79e73bdf986ba4caf305cd09aae82c10",
         executable = True,
     )
 
@@ -39,6 +47,6 @@ def pkl_setup():
         name = "rules_pkl_deps",
         artifacts = PKL_DEPS,
         repositories = [
-            "https://artifacts.apple.com/libs-release",
+            "https://repo1.maven.org/maven2/",
         ],
     )

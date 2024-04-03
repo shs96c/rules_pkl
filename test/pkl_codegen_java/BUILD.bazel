@@ -12,7 +12,7 @@ java_library(
     name = "gen_lib",
     srcs = [":base"],
     deps = [artifact(
-        "com.apple.pkl:pkl-config-java",
+        "org.pkl-lang:pkl-config-java",
         repository_name = "rules_pkl_deps",
     )],
 )
@@ -32,11 +32,11 @@ java_test(
             repository_name = "rules_pkl_deps",
         ),
         artifact(
-            "com.apple.pkl:pkl-config-java",
+            "org.pkl-lang:pkl-config-java",
             repository_name = "rules_pkl_deps",
         ),
         artifact(
-            "com.apple.pkl:pkl-tools",
+            "org.pkl-lang:pkl-tools",
             repository_name = "rules_pkl_deps",
         ),
         ":gen_lib",

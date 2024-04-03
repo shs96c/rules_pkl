@@ -19,16 +19,17 @@ bazel_dep(name = "aspect_bazel_lib", version = "2.5.3")
 pkl = use_extension("//pkl:extensions.bzl", "pkl")
 use_repo(
     pkl,
-    "pkl-cli-linux-arm64",
+    "pkl-cli-linux-aarch64",
     "pkl-cli-linux-x86_64",
-    "pkl-cli-macos",
+    "pkl-cli-macos-aarch64",
+    "pkl-cli-macos-x86_64",
 )
 
 register_toolchains(
     "@rules_pkl//pkl:codegen-toolchain",
-    "@rules_pkl//pkl:pkl_toolchain_macos_arm64",
+    "@rules_pkl//pkl:pkl_toolchain_macos_aarch64",
     "@rules_pkl//pkl:pkl_toolchain_macos_x86_64",
-    "@rules_pkl//pkl:pkl_toolchain_linux_arm64",
+    "@rules_pkl//pkl:pkl_toolchain_linux_aarch64",
     "@rules_pkl//pkl:pkl_toolchain_linux_x86_64",
 )
 
@@ -36,17 +37,17 @@ maven = use_extension("@rules_jvm_external//:extensions.bzl", "maven")
 maven.install(
     name = "rules_pkl_deps",
     artifacts = [
-        "com.apple.pkl:pkl-cli-java:0.24.6",
-        "com.apple.pkl:pkl-codegen-java:0.24.6",
-        "com.apple.pkl:pkl-config-java:0.24.6",
-        "com.apple.pkl:pkl-doc:0.24.6",
-        "com.apple.pkl:pkl-tools:0.24.6",
+        "org.pkl-lang:pkl-cli-java:0.25.3",
+        "org.pkl-lang:pkl-codegen-java:0.25.3",
+        "org.pkl-lang:pkl-config-java:0.25.3",
+        "org.pkl-lang:pkl-doc:0.25.3",
+        "org.pkl-lang:pkl-tools:0.25.3",
         "com.google.code.gson:gson:2.10.1",
         "org.junit.vintage:junit-vintage-engine:5.7.0",
     ],
     lock_file = "//pkl/private:pkl_deps_install.json",
     repositories = [
-        "https://artifacts.apple.com/libs-release",
+        "https://repo1.maven.org/maven2/",
     ],
 )
 use_repo(

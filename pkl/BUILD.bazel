@@ -18,24 +18,24 @@ toolchain_type(
 )
 
 pkl_toolchain(
-    name = "pkl_macos_arm64",
-    cli = "@pkl-cli-macos//file",
+    name = "pkl_macos_aarch64",
+    cli = "@pkl-cli-macos-aarch64//file",
     visibility = ["//visibility:public"],
 )
 
 toolchain(
-    name = "pkl_toolchain_macos_arm64",
+    name = "pkl_toolchain_macos_aarch64",
     exec_compatible_with = [
         "@platforms//os:macos",
         "@platforms//cpu:aarch64",
     ],
-    toolchain = ":pkl_macos_arm64",
+    toolchain = ":pkl_macos_aarch64",
     toolchain_type = ":toolchain_type",
 )
 
 pkl_toolchain(
     name = "pkl_macos_x86_64",
-    cli = "@pkl-cli-macos//file",
+    cli = "@pkl-cli-macos-x86_64//file",
     visibility = ["//visibility:public"],
 )
 
@@ -50,18 +50,18 @@ toolchain(
 )
 
 pkl_toolchain(
-    name = "pkl_linux_arm64",
-    cli = "@pkl-cli-linux-arm64//file",
+    name = "pkl_linux_aarch64",
+    cli = "@pkl-cli-linux-aarch64//file",
     visibility = ["//visibility:public"],
 )
 
 toolchain(
-    name = "pkl_toolchain_linux_arm64",
+    name = "pkl_toolchain_linux_aarch64",
     exec_compatible_with = [
         "@platforms//os:linux",
         "@platforms//cpu:aarch64",
     ],
-    toolchain = ":pkl_linux_arm64",
+    toolchain = ":pkl_linux_aarch64",
     toolchain_type = ":toolchain_type",
 )
 
@@ -86,7 +86,7 @@ java_binary(
     main_class = "org.pkl.cli.Main",
     runtime_deps = [
         artifact(
-            "com.apple.pkl:pkl-cli-java",
+            "org.pkl-lang:pkl-cli-java",
             repository_name = "rules_pkl_deps",
         ),
     ],
@@ -153,7 +153,7 @@ java_binary(
     ],
     runtime_deps = [
         artifact(
-            "com.apple.pkl:pkl-codegen-java",
+            "org.pkl-lang:pkl-codegen-java",
             repository_name = "rules_pkl_deps",
         ),
     ],
@@ -167,7 +167,7 @@ java_binary(
     ],
     runtime_deps = [
         artifact(
-            "com.apple.pkl:pkl-doc:0.24.6",
+            "org.pkl-lang:pkl-doc:0.25.3",
             repository_name = "rules_pkl_deps",
         ),
     ],

@@ -129,7 +129,7 @@ def pkl_config_java_library(name, files, module_path = [], generate_getters = No
         tags = tags,
     )
 
-    pkl_deps = [artifact("com.apple.pkl:pkl-config-java", repository_name = "rules_pkl_deps")]
+    pkl_deps = [artifact("org.pkl-lang:pkl-config-java", repository_name = "rules_pkl_deps")]
 
     # Ensure that there are no duplicate entries in the deps
     all_deps = depset(
