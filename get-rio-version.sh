@@ -2,4 +2,4 @@
 
 set -eu
 
-sed -n 's/.*"org.pkl-lang:pkl-cli-java:\([^"]*\)".*/\1/p' < MODULE.bazel | head -1
+awk -F\" '/version =/ { print $2; exit }' MODULE.bazel
