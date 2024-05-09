@@ -6,3 +6,5 @@
 /docs export-ignore
 /examples export-ignore
 /renovate.json export-ignore
+
+*.pkl linguist-language=Groovy

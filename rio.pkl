@@ -1,0 +1,58 @@
+@ModuleInfo { minPklVersion = "0.24.0" }
+amends "package://artifacts.apple.com/pkl/pkl/rio@1.3.1#/Rio.pkl"
+
+pipelines {
+  new {
+    branchName = "apple"
+    machine {
+      baseImage = "docker.apple.com/acp/bazelw:latest"
+    }
+    build {
+      template = "freestyle:v4:prb"
+      steps {
+        // language=bash
+          """
+          # bazelrc declares a cc toolchain that depends on the Federation but that this project can't depend
+          # on the federation, so removing the bazelrc.
+          rm /etc/bazel.bazelrc
+          bazel --nosystem_rc --server_javabase=/applejdk test --curses=no --color=yes --show_timestamps ... --announce_rc
+          """
+      }
+    }
+  }
+
+  new {
+    branchName = "apple"
+    machine {
+      baseImage = "docker.apple.com/acp/bazelw:latest"
+      env {
+        ["VERSION"] = "$(./get-rio-version.sh)-apple-#{}"
+      }
+    }
+    build {
+      template = "freestyle:v4:publish"
+      steps {
+        // language=bash
+          """
+          tar -cavf rules_pkl-$VERSION.tar.gz --anchored --exclude-from .tar-exclude-from-file.conf *
+
+          ci stage-lib "rules_pkl-$VERSION.tar.gz,bazel/rules/rules_pkl/"
+          """
+      }
+    }
+    package {
+      freeform {
+        new {
+          publish {
+            new {
+              repo = "pie-devtools-local"
+            }
+          }
+        }
+      }
+    }
+    trigger {
+      gitPush = false
+    }
+  }
+}
