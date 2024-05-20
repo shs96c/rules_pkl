@@ -5,3 +5,10 @@ dependencies {
     uri = "package://pkg.pkl-lang.org/pkl-k8s/k8s@1.0.1"
   }
 }
+
+package {
+  name = "mypackage"
+  version = "1.0.0"
+  baseUri = "package://example.com/\(name)"
+  packageZipUrl = "https://example.com/\(name)/\(name)@\(version).zip"
+}
