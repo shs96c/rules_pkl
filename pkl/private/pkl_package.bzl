@@ -44,7 +44,7 @@ def _pkl_package_impl(ctx):
     args = ctx.actions.args()
     args.add_all(["project", "package", "{file_dir}".format(file_dir = pkl_project_file.dirname)])
     args.add_all(["--output-path", "{output_dir}".format(output_dir = output_dir)])
-    args.add("{extra_flags}".format(extra_flags = " ".join(ctx.attr.extra_flags)))
+    args.add_all(ctx.attr.extra_flags)
 
     ctx.actions.run(
         executable = executable,
